@@ -9,8 +9,8 @@
    Apple 风格动画配置
    ======================================== */
 
-// iOS 缓动曲线
-const easeOut = [0.22, 1, 0.36, 1] as const
+// iOS 缓动曲线（导出供其他模块使用）
+export const easeOut = [0.22, 1, 0.36, 1] as const
 
 // 滚动进入动画（带阻尼感）
 export const fadeInUp = {

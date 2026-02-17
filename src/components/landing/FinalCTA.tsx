@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Download, Github } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { fadeInUp, staggerContainer, staggerItem, viewportConfig } from "@/lib/motion"
+import { staggerContainer, staggerItem, viewportConfig } from "@/lib/motion"
+import { cn } from "@/lib/utils"
 
 interface FinalCTAProps {
   className?: string
@@ -23,10 +24,10 @@ export function FinalCTA({ className }: FinalCTAProps) {
       initial="hidden"
       whileInView="visible"
       viewport={viewportConfig}
-      className={[
+      className={cn(
         "py-20 md:py-28 lg:py-32 relative overflow-hidden",
-        className || ""
-      ].join(" ")}
+        className
+      )}
     >
       {/* 渐变背景 */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />

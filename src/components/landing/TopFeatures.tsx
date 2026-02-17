@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { History, Settings as SettingsIcon, FolderOpen, Sparkles } from "lucide-react"
 import { motion } from "framer-motion"
 import { staggerContainer, staggerItem, viewportConfig } from "@/lib/motion"
+import { cn } from "@/lib/utils"
 
 interface TopFeatureItem {
   icon: React.ReactNode
@@ -49,7 +50,7 @@ export function TopFeatures({ className }: TopFeaturesProps) {
       initial="hidden"
       whileInView="visible"
       viewport={viewportConfig}
-      className={["py-20 md:py-28 lg:py-32", className || ""].join(" ")}
+      className={cn("py-20 md:py-28 lg:py-32", className)}
     >
       <div className="container">
         {/* 章节标题 */}

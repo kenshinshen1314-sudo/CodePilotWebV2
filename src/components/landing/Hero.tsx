@@ -11,7 +11,9 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowRight, Terminal, Zap } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { fadeInUp, staggerContainer, staggerItem, viewportConfig } from "@/lib/motion"
+import { staggerContainer, staggerItem, viewportConfig } from "@/lib/motion"
+import { cn } from "@/lib/utils"
+import { DIMENSIONS } from "@/lib/constants"
 
 interface HeroProps {
   className?: string
@@ -23,15 +25,15 @@ export function Hero({ className }: HeroProps) {
       initial="hidden"
       whileInView="visible"
       viewport={viewportConfig}
-      className={[
+      className={cn(
         "min-h-[90vh] flex items-center justify-center relative overflow-hidden",
         "bg-gradient-to-b from-background via-background to-muted/20",
-        className || ""
-      ].join(" ")}
+        className
+      )}
     >
       {/* 背景装饰 */}
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-primary/10 rounded-full" style={{ width: `${DIMENSIONS.HERO_GRADIENT_SIZE}px`, height: `${DIMENSIONS.HERO_GRADIENT_SIZE}px`, filter: `blur(${DIMENSIONS.HERO_GRADIENT_BLUR}px)` }} />
 
       <div className="container relative z-10">
         <motion.div

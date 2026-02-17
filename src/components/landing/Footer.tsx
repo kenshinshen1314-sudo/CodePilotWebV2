@@ -10,6 +10,7 @@ import { Github, Twitter, Heart } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { staggerContainer, staggerItem, viewportConfig } from "@/lib/motion"
+import { cn } from "@/lib/utils"
 
 interface FooterProps {
   className?: string
@@ -38,13 +39,38 @@ const socialLinks = [
   { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
 ]
 
+interface LinkColumnProps {
+  title: string
+  links: ReadonlyArray<{ readonly label: string; readonly href: string }>
+}
+
+function LinkColumn({ title, links }: LinkColumnProps) {
+  return (
+    <motion.div variants={staggerItem}>
+      <h4 className="font-semibold mb-4">{title}</h4>
+      <ul className="space-y-2">
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link
+              href={link.href}
+              className="text-sm text-muted-foreground hover:text-foreground hover:translate-x-1 transition-all duration-200 inline-block"
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </motion.div>
+  )
+}
+
 export function Footer({ className }: FooterProps) {
   return (
     <motion.footer
       initial="hidden"
       whileInView="visible"
       viewport={viewportConfig}
-      className={["border-t bg-muted/30", className || ""].join(" ")}
+      className={cn("border-t bg-muted/30", className)}
     >
       <div className="container py-12">
         <motion.div
@@ -60,53 +86,9 @@ export function Footer({ className }: FooterProps) {
           </motion.div>
 
           {/* 链接列 */}
-          <motion.div variants={staggerItem}>
-            <h4 className="font-semibold mb-4">产品</h4>
-            <ul className="space-y-2">
-              {footerLinks.product.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground hover:translate-x-1 transition-all duration-200 inline-block"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <motion.div variants={staggerItem}>
-            <h4 className="font-semibold mb-4">资源</h4>
-            <ul className="space-y-2">
-              {footerLinks.resources.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground hover:translate-x-1 transition-all duration-200 inline-block"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <motion.div variants={staggerItem}>
-            <h4 className="font-semibold mb-4">关于</h4>
-            <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground hover:translate-x-1 transition-all duration-200 inline-block"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
+          <LinkColumn title="产品" links={footerLinks.product} />
+          <LinkColumn title="资源" links={footerLinks.resources} />
+          <LinkColumn title="关于" links={footerLinks.company} />
         </motion.div>
 
         {/* 底部栏 */}

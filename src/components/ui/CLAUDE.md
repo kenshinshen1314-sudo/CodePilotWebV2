@@ -50,6 +50,8 @@ scroll-area.tsx: 滚动区域组件
 separator.tsx: 分隔线组件
 command.tsx: 命令面板组件
 collapsible.tsx: 折叠组件
+ProviderLogos.tsx: Provider Logo 组件（Anthropic/Google/OpenAI）
+SessionCard.tsx: 会话卡片组件
 
 法则: 成员完整·一行一文件·父级链接·技术词前置
 

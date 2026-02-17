@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Wifi, WifiOff, AlertCircle, CheckCircle2 } from "lucide-react"
 import { motion } from "framer-motion"
 import { staggerContainer, staggerItem, viewportConfig } from "@/lib/motion"
+import { cn } from "@/lib/utils"
 
 interface ConnectionStatusProps {
   className?: string
@@ -43,7 +44,7 @@ export function ConnectionStatus({ className }: ConnectionStatusProps) {
       initial="hidden"
       whileInView="visible"
       viewport={viewportConfig}
-      className={["py-20 md:py-28 lg:py-32 bg-muted/30", className || ""].join(" ")}
+      className={cn("py-20 md:py-28 lg:py-32 bg-muted/30", className)}
     >
       <div className="container">
         <motion.div

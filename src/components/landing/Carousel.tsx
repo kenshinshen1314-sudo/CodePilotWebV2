@@ -6,10 +6,11 @@
  */
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import { TIMING } from "@/lib/constants"
 
 const slides = [
   { src: "/images/1.png", alt: "设计系统 - 颜色系统" },
@@ -19,37 +20,58 @@ const slides = [
   { src: "/images/5.png", alt: "设计系统 - 表单控件" },
   { src: "/images/6.png", alt: "设计系统 - 导航组件" },
   { src: "/images/7.png", alt: "设计系统 - 反馈组件" },
-]
+] as const
 
 export function DesignShowcase() {
   const [current, setCurrent] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const resumeTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 清除恢复定时器
+  const clearResumeTimer = useCallback(() => {
+    if (resumeTimerRef.current) {
+      clearTimeout(resumeTimerRef.current)
+      resumeTimerRef.current = null
+    }
+  }, [])
+
+  // 暂停后延时恢复自动播放
+  const pauseAndResumeAutoPlay = useCallback(() => {
+    setIsAutoPlaying(false)
+    clearResumeTimer()
+    resumeTimerRef.current = setTimeout(() => {
+      setIsAutoPlaying(true)
+      resumeTimerRef.current = null
+    }, TIMING.CAROUSEL_RESUME_DELAY)
+  }, [clearResumeTimer])
+
+  // 组件卸载时清理定时器
+  useEffect(() => {
+    return () => clearResumeTimer()
+  }, [clearResumeTimer])
 
   useEffect(() => {
     if (!isAutoPlaying) return
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length)
-    }, 5000)
+    }, TIMING.CAROUSEL_AUTO_PLAY)
     return () => clearInterval(timer)
   }, [isAutoPlaying])
 
-  const goTo = (index: number) => {
+  const goTo = useCallback((index: number) => {
     setCurrent(index)
-    setIsAutoPlaying(false)
-    setTimeout(() => setIsAutoPlaying(true), 5000)
-  }
+    pauseAndResumeAutoPlay()
+  }, [pauseAndResumeAutoPlay])
 
-  const goPrev = () => {
+  const goPrev = useCallback(() => {
     setCurrent((prev) => (prev - 1 + slides.length) % slides.length)
-    setIsAutoPlaying(false)
-    setTimeout(() => setIsAutoPlaying(true), 5000)
-  }
+    pauseAndResumeAutoPlay()
+  }, [pauseAndResumeAutoPlay])
 
-  const goNext = () => {
+  const goNext = useCallback(() => {
     setCurrent((prev) => (prev + 1) % slides.length)
-    setIsAutoPlaying(false)
-    setTimeout(() => setIsAutoPlaying(true), 5000)
-  }
+    pauseAndResumeAutoPlay()
+  }, [pauseAndResumeAutoPlay])
 
   return (
     <section className="py-12 md:py-16 bg-muted/20">
