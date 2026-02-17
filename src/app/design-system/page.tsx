@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 @/components/ui 的所有组件，依赖 lucide-react 的图标
- * [OUTPUT]: 对外提供 DesignSystem 展示页面，展示所有 30 个 shadcn/ui 组件
+ * [OUTPUT]: 对外提供 DesignSystem 展示页面，展示所有 36 个 shadcn/ui 组件
  * [POS]: src/app/design-system 的设计系统展示页面
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -99,6 +99,30 @@ import {
 } from "@/components/ui/hover-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Slider } from "@/components/ui/slider";
+import { Toggle } from "@/components/ui/toggle";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { toast } from "sonner";
 import {
   AlertCircle,
@@ -123,6 +147,8 @@ import {
   Search,
   Frame,
   Circle,
+  Scale,
+  PanelLeft,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -153,7 +179,7 @@ export default function DesignSystemPage() {
             <Palette className="h-8 w-8 text-primary" />
             <div>
               <h1 className="text-3xl font-bold">Design System</h1>
-              <p className="text-muted-foreground">Kodama Grove Theme + 30 shadcn/ui Components</p>
+              <p className="text-muted-foreground">Kodama Grove Theme + 36 shadcn/ui Components</p>
             </div>
           </div>
         </div>
@@ -896,17 +922,186 @@ export default function DesignSystemPage() {
 
         <Separator />
 
+        {/* 17. Slider & Toggle */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <Scale className="h-5 w-5" />
+            <h2 className="text-2xl font-bold">17. Slider & Toggle</h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Slider</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Default Slider</Label>
+                  <Slider defaultValue={[50]} max={100} step={1} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Range Slider</Label>
+                  <Slider defaultValue={[25, 75]} max={100} step={1} />
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Toggle & Toggle Group</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Toggle</Label>
+                  <div className="flex gap-2">
+                    <Toggle>Bold</Toggle>
+                    <Toggle variant="outline">Italic</Toggle>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Toggle Group</Label>
+                  <ToggleGroup type="single" defaultValue="left">
+                    <ToggleGroupItem value="left">
+                      <PanelLeft className="h-4 w-4" />
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="center">
+                      <Frame className="h-4 w-4" />
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="right">
+                      <Box className="h-4 w-4" />
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* 18. Menu Components */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <Menu className="h-5 w-5" />
+            <h2 className="text-2xl font-bold">18. Menubar & Context Menu</h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Menubar</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Menubar>
+                  <MenubarMenu>
+                    <MenubarTrigger>File</MenubarTrigger>
+                    <MenubarContent>
+                      <MenubarItem>
+                        New Tab <MenubarShortcut>⌘T</MenubarShortcut>
+                      </MenubarItem>
+                      <MenubarItem>New Window</MenubarItem>
+                      <MenubarSeparator />
+                      <MenubarItem>Print</MenubarItem>
+                    </MenubarContent>
+                  </MenubarMenu>
+                  <MenubarMenu>
+                    <MenubarTrigger>Edit</MenubarTrigger>
+                    <MenubarContent>
+                      <MenubarItem>Undo</MenubarItem>
+                      <MenubarItem>Redo</MenubarItem>
+                    </MenubarContent>
+                  </MenubarMenu>
+                  <MenubarMenu>
+                    <MenubarTrigger>View</MenubarTrigger>
+                  </MenubarMenu>
+                </Menubar>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Context Menu</CardTitle>
+                <CardDescription>Right-click anywhere to test</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ContextMenu>
+                  <ContextMenuTrigger>
+                    <div className="flex h-24 w-full items-center justify-center rounded-md border border-dashed text-sm">
+                      Right click here
+                    </div>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <p className="px-2 py-1.5 text-sm font-medium">Actions</p>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem>
+                      Copy <ContextMenuShortcut>⌘C</ContextMenuShortcut>
+                    </ContextMenuItem>
+                    <ContextMenuItem>Paste</ContextMenuItem>
+                    <ContextMenuSeparator />
+                    <ContextMenuSub>
+                      <ContextMenuSubTrigger>More</ContextMenuSubTrigger>
+                      <ContextMenuSubContent>
+                        <ContextMenuItem>Option 1</ContextMenuItem>
+                        <ContextMenuItem>Option 2</ContextMenuItem>
+                      </ContextMenuSubContent>
+                    </ContextMenuSub>
+                  </ContextMenuContent>
+                </ContextMenu>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* 19. Aspect Ratio */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <Frame className="h-5 w-5" />
+            <h2 className="text-2xl font-bold">19. Aspect Ratio</h2>
+          </div>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>16:9</Label>
+                  <AspectRatio ratio={16 / 9}>
+                    <div className="flex h-full w-full items-center justify-center rounded-md bg-muted">
+                      16:9
+                    </div>
+                  </AspectRatio>
+                </div>
+                <div className="space-y-2">
+                  <Label>4:3</Label>
+                  <AspectRatio ratio={4 / 3}>
+                    <div className="flex h-full w-full items-center justify-center rounded-md bg-muted">
+                      4:3
+                    </div>
+                  </AspectRatio>
+                </div>
+                <div className="space-y-2">
+                  <Label>1:1</Label>
+                  <AspectRatio ratio={1 / 1}>
+                    <div className="flex h-full w-full items-center justify-center rounded-md bg-muted">
+                      1:1
+                    </div>
+                  </AspectRatio>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
         {/* Component Summary */}
         <section>
           <Card>
             <CardHeader>
-              <CardTitle>全部 30 个组件清单</CardTitle>
+              <CardTitle>全部 36 个组件清单</CardTitle>
               <CardDescription>已展示所有 shadcn/ui 组件</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 text-sm">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 text-sm">
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Accordion</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Alert</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Aspect Ratio</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Avatar</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Badge</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Button</div>
@@ -914,12 +1109,14 @@ export default function DesignSystemPage() {
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Checkbox</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Collapsible</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Command</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Context Menu</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Dialog</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Dropdown Menu</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Form</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Hover Card</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Input</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Label</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Menubar</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Navigation Menu</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Popover</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Progress</div>
@@ -929,11 +1126,14 @@ export default function DesignSystemPage() {
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Separator</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Sheet</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Skeleton</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Slider</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Sonner (Toast)</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Switch</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Table</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Tabs</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Textarea</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Toggle</div>
+                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Toggle Group</div>
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /> Tooltip</div>
               </div>
             </CardContent>

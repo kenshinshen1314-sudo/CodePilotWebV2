@@ -10,7 +10,7 @@ src/ - 源代码 (3子目录: app, components, lib)
     globals.css - 全局样式，TailwindCSS v4 + shadcn CSS 变量
   components/ - 组件库
     layout/header.tsx - 头部导航，Logo + Design System 入口
-    ui/ - shadcn/ui 组件（30个：accordion, alert, avatar, badge, button, card, checkbox, collapsible, command, dialog, dropdown-menu, form, hover-card, input, label, navigation-menu, popover, progress, radio-group, scroll-area, select, separator, sheet, skeleton, sonner, switch, table, tabs, textarea, tooltip）
+    ui/ - shadcn/ui 组件（36个：accordion, alert, aspect-ratio, avatar, badge, button, card, checkbox, collapsible, command, context-menu, dialog, dropdown-menu, form, hover-card, input, label, menubar, navigation-menu, popover, progress, radio-group, scroll-area, select, separator, sheet, skeleton, slider, sonner, switch, table, tabs, textarea, toggle, toggle-group, tooltip）
   lib/ - 工具函数
     utils.ts - cn() 样式合并函数
 </directory>

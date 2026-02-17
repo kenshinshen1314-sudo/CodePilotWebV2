@@ -1,13 +1,13 @@
 # src/components/ui/
 > L2 | 父级: /src/components/CLAUDE.md
 
-shadcn/ui 组件库（30个）
+shadcn/ui 组件库（36个）
 
 核心交互
 button.tsx: 按钮组件，variant/default/destructive/outline/secondary/ghost/link
 input.tsx: 输入框组件
 label.tsx: 标签组件
-card.tsx: 卡片组件，Card/Header/Title/Description/Footer
+card.tsx: 卡片组件，Card/Header/Title/Description/Action/Footer
 dialog.tsx: 对话框组件，Dialog/Trigger/Content
 sheet.tsx: 侧边栏组件，Sheet/Trigger/Content
 
@@ -18,6 +18,9 @@ checkbox.tsx: 复选框组件
 radio-group.tsx: 单选框组件，RadioGroupItem
 switch.tsx: 开关组件
 textarea.tsx: 多行文本输入
+slider.tsx: 滑块组件
+toggle.tsx: 切换按钮组件
+toggle-group.tsx: 切换组组件，ToggleGroupItem
 
 反馈
 alert.tsx: 警告提示组件，Alert/Title/Description
@@ -31,6 +34,8 @@ tabs.tsx: 标签页组件，TabsList/Trigger/Content
 accordion.tsx: 手风琴组件，AccordionItem/Trigger/Content
 dropdown-menu.tsx: 下拉菜单组件，DropdownMenu/Trigger/Content
 navigation-menu.tsx: 导航菜单组件
+menubar.tsx: 菜单栏组件，Menubar/Menu/Trigger/Content
+context-menu.tsx: 右键菜单组件，ContextMenu/Trigger/Content/Sub
 
 展示
 avatar.tsx: 头像组件，Avatar/Image/Fallback
@@ -38,6 +43,7 @@ table.tsx: 表格组件，Table/Header/Body/Row/Head/Cell
 popover.tsx: 气泡卡片组件，Popover/Trigger/Content
 tooltip.tsx: 提示框组件，需 TooltipProvider 包裹
 hover-card.tsx: 悬停卡片组件
+aspect-ratio.tsx: 宽高比组件，AspectRatio
 
 工具
 scroll-area.tsx: 滚动区域组件
