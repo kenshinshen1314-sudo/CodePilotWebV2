@@ -5,6 +5,7 @@ Landing Page 章节组件
 
 章节组件
 Hero.tsx: 首屏章节，标题+副标题+CTA按钮+社会证明
+Carousel.tsx: 设计展示轮播图，7张设计稿自动轮播
 FeaturesSection.tsx: 功能亮点章节，8个功能卡片网格
 TopFeatures.tsx: 核心价值章节，最有价值的3个功能
 ConnectionStatus.tsx: 连接状态章节，状态展示+帮助提示

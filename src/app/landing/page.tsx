@@ -6,6 +6,7 @@
  */
 import {
   Hero,
+  DesignShowcase,
   FeaturesSection,
   TopFeatures,
   ConnectionStatus,
@@ -17,6 +18,7 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen">
       <Hero />
+      <DesignShowcase />
       <FeaturesSection />
       <TopFeatures />
       <ConnectionStatus />
