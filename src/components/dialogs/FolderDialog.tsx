@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 依赖 react，依赖 @/components/ui 的组件，依赖 lucide-react 图标
- * [OUTPUT]: 对外提供 FolderDialog 文件夹选择对话框
+ * [OUTPUT]: 对外提供 FolderDialog 文件夹/文件选择对话框
  * [POS]: src/components/dialogs 的文件夹选择对话框组件
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -19,6 +19,9 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Folder,
   FolderOpen,
+  FileCode,
+  FileText,
+  File,
   ChevronRight,
   Home,
   Loader2,
@@ -29,6 +32,7 @@ interface FolderDialogProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void
   onSelect?: (path: string) => void
+  mode?: "folder" | "file"
 }
 
 interface FolderNode {
@@ -41,21 +45,35 @@ interface FolderNode {
   loaded?: boolean
 }
 
-export function FolderDialog({ open, onOpenChange, onSelect }: FolderDialogProps) {
+const getFileIcon = (name: string) => {
+  if (name.endsWith(".tsx") || name.endsWith(".ts")) {
+    return <FileCode className="h-4 w-4 text-blue-500" />
+  }
+  if (name.endsWith(".js") || name.endsWith(".jsx")) {
+    return <FileCode className="h-4 w-4 text-yellow-500" />
+  }
+  if (name.endsWith(".json")) {
+    return <FileCode className="h-4 w-4 text-green-500" />
+  }
+  if (name.endsWith(".md") || name.endsWith(".txt")) {
+    return <FileText className="h-4 w-4 text-gray-500" />
+  }
+  return <File className="h-4 w-4 text-gray-400" />
+}
+
+export function FolderDialog({ open, onOpenChange, onSelect, mode = "folder" }: FolderDialogProps) {
   const [folders, setFolders] = useState<FolderNode[]>([])
   const [selectedPath, setSelectedPath] = useState<string | null>(null)
   const [currentPath, setCurrentPath] = useState("/Users/kenshin")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Load root directories on mount
   useEffect(() => {
     if (open) {
       loadDirectory("/Users/kenshin")
     }
   }, [open])
 
-  // Load directory contents
   const loadDirectory = async (dirPath: string) => {
     setLoading(true)
     setError(null)
@@ -74,32 +92,26 @@ export function FolderDialog({ open, onOpenChange, onSelect }: FolderDialogProps
     }
   }
 
-  // Load children when expanding a folder
   const loadChildren = async (node: FolderNode): Promise<FolderNode[]> => {
     try {
       const res = await fetch(`/api/folders?path=${encodeURIComponent(node.path)}`)
       const data = await res.json()
-      if (data.error) {
-        return []
-      }
+      if (data.error) return []
       return data.items
     } catch {
       return []
     }
   }
 
-  // Handle Go button - navigate to path
   const handleGo = async () => {
     await loadDirectory(currentPath)
   }
 
-  // Toggle folder expansion
   const handleToggle = async (id: string) => {
     const updateTree = async (nodes: FolderNode[]): Promise<FolderNode[]> => {
       return Promise.all(
         nodes.map(async (node) => {
           if (node.id === id && node.type === "folder") {
-            // Load children if not loaded
             if (!node.loaded) {
               const children = await loadChildren(node)
               return { ...node, expanded: true, children, loaded: true }
@@ -113,13 +125,11 @@ export function FolderDialog({ open, onOpenChange, onSelect }: FolderDialogProps
         })
       )
     }
-
     setFolders(await updateTree(folders))
   }
 
   const handleSelect = (node: FolderNode) => {
     setSelectedPath(node.path)
-    // Auto-expand if it's a folder and not loaded
     if (node.type === "folder" && !node.loaded) {
       handleToggle(node.id)
     }
@@ -135,14 +145,15 @@ export function FolderDialog({ open, onOpenChange, onSelect }: FolderDialogProps
   const renderNode = (node: FolderNode, level: number = 0) => {
     const isSelected = selectedPath === node.path
     const isExpanded = node.expanded
+    const isSelectable = mode === "folder" ? node.type === "folder" : node.type === "file"
 
     return (
       <div key={node.id}>
         <div
-          onClick={() => handleSelect(node)}
+          onClick={() => isSelectable && handleSelect(node)}
           className={cn(
-            "w-full flex items-center gap-1.5 px-2 py-1.5 rounded text-sm transition-colors cursor-pointer",
-            isSelected ? "bg-primary/10 text-foreground" : "hover:bg-muted/50 text-foreground"
+            "flex items-center gap-1 px-2 py-1.5 rounded text-sm transition-colors cursor-pointer",
+            isSelected ? "bg-primary/10 text-foreground" : "hover:bg-muted text-foreground"
           )}
           style={{ paddingLeft: `${level * 16 + 8}px` }}
         >
@@ -154,9 +165,7 @@ export function FolderDialog({ open, onOpenChange, onSelect }: FolderDialogProps
               }}
               className="p-0.5 hover:bg-muted rounded"
             >
-              {loading && node.expanded ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
-              ) : isExpanded ? (
+              {isExpanded ? (
                 <ChevronRight className="h-3 w-3 rotate-90" />
               ) : (
                 <ChevronRight className="h-3 w-3" />
@@ -170,9 +179,9 @@ export function FolderDialog({ open, onOpenChange, onSelect }: FolderDialogProps
               <Folder className="h-4 w-4 text-amber-500 shrink-0" />
             )
           ) : (
-            <span className="h-4 w-4" />
+            getFileIcon(node.name)
           )}
-          <span className="truncate">{node.name}</span>
+          <span className="truncate max-w-[200px]">{node.name}</span>
         </div>
         {node.type === "folder" && isExpanded && node.children && (
           <div>
@@ -183,53 +192,57 @@ export function FolderDialog({ open, onOpenChange, onSelect }: FolderDialogProps
     )
   }
 
+  const dialogTitle = mode === "folder" ? "Select Folder" : "Select File"
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
+      <DialogContent className="max-w-md overflow-hidden">
         <DialogHeader>
-          <DialogTitle>Select Folder</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Path input with Go button */}
+        <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Home className="h-4 w-4 text-muted-foreground shrink-0" />
             <Input
               value={currentPath}
               onChange={(e) => setCurrentPath(e.target.value)}
-              className="flex-1"
+              className="flex-1 truncate"
               onKeyDown={(e) => e.key === "Enter" && handleGo()}
             />
-            <Button onClick={handleGo} disabled={loading} className="shrink-0">
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Go"}
+            <Button onClick={handleGo} disabled={loading} size="sm">
+              Go
             </Button>
           </div>
 
-          {/* Error message */}
           {error && (
-            <div className="text-sm text-destructive p-2 bg-destructive/10 rounded">
+            <div className="text-sm text-red-500 p-2 bg-red-50 rounded">
               {error}
             </div>
           )}
 
-          {/* Folder tree */}
-          <ScrollArea className="h-[300px] border rounded-md p-2">
-            <div className="font-mono text-sm">
-              {loading && folders.length === 0 ? (
-                <div className="flex items-center justify-center py-8 text-muted-foreground">
+          <ScrollArea className="h-[280px] w-full border rounded-md overflow-hidden">
+            <div className="p-3 text-sm min-h-full overflow-hidden">
+              {loading ? (
+                <div className="flex items-center justify-center py-10 text-muted-foreground">
                   <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                  Loading...
+                  <span>Loading...</span>
+                </div>
+              ) : folders.length > 0 ? (
+                <div className="space-y-0.5">
+                  {folders.map((node) => renderNode(node))}
                 </div>
               ) : (
-                folders.map((node) => renderNode(node))
+                <div className="text-center py-10 text-muted-foreground text-sm">
+                  No files or folders
+                </div>
               )}
             </div>
           </ScrollArea>
 
-          {/* Selected path */}
           {selectedPath && (
-            <div className="text-sm text-muted-foreground">
-              Selected: <span className="text-foreground font-mono">{selectedPath}</span>
+            <div className="text-sm text-muted-foreground truncate">
+              Selected: <span className="text-foreground truncate block max-w-[250px] align-bottom">{selectedPath}</span>
             </div>
           )}
         </div>
@@ -239,7 +252,7 @@ export function FolderDialog({ open, onOpenChange, onSelect }: FolderDialogProps
             Cancel
           </Button>
           <Button onClick={handleConfirm} disabled={!selectedPath}>
-            Select
+            {mode === "folder" ? "Select" : "Upload"}
           </Button>
         </DialogFooter>
       </DialogContent>

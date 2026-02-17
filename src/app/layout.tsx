@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import { ProviderProvider } from "@/lib/provider-context";
 
 export const metadata: Metadata = {
   title: "CodePilot Web",
@@ -23,7 +24,9 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body>
         <TooltipProvider>
-          {children}
+          <ProviderProvider>
+            {children}
+          </ProviderProvider>
         </TooltipProvider>
         <Toaster />
       </body>

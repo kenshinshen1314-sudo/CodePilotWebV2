@@ -1,11 +1,11 @@
 /**
- * [INPUT]: 依赖 react，依赖 @/components/ui 的组件
+ * [INPUT]: 依赖 react，依赖 @/components/ui 的组件，依赖 lucide-react 图标
  * [OUTPUT]: 对外提供 ChatMessage 消息组件
  * [POS]: src/components/chat 的消息展示组件
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
-import { Copy, Check } from "lucide-react"
+import { Copy, Check, Paperclip } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -22,6 +22,7 @@ export interface Message {
   timestamp: string
   tokens: number
   cost: string
+  attachments?: Array<{ name: string; path: string }>
 }
 
 interface ChatMessageProps {
@@ -39,10 +40,14 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
   const isUser = message.role === "user"
 
+  // Check if message has file attachments
+  const hasAttachments = message.attachments && message.attachments.length > 0
+  const isFileContentMessage = message.content.includes("Attached files:")
+
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div className={`flex gap-3 max-w-[85%] ${isUser ? "flex-row-reverse" : ""}`}>
-        {/* 头像 */}
+        {/* Avatar */}
         <div
           className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium shrink-0 ${
             isUser
@@ -53,37 +58,32 @@ export function ChatMessage({ message }: ChatMessageProps) {
           {isUser ? "U" : "AI"}
         </div>
 
-        {/* 消息内容 */}
+        {/* Message content */}
         <div>
-          {/* 消息 */}
+          {/* Attachments indicator */}
+          {hasAttachments && (
+            <div className="flex items-center gap-1.5 mb-2 ml-1">
+              <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">
+                {message.attachments!.length} file(s) attached
+              </span>
+            </div>
+          )}
+
+          {/* Message */}
           <div
-            className={`rounded-2xl px-4 py-2.5 ${
+            className={`rounded-2xl px-4 py-2.5 max-w-[90%] ${
               isUser
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted"
             }`}
           >
-            <div className="prose prose-sm dark:prose-invert max-w-none">
-              {message.content.split("```").map((part, i) => {
-                if (i % 2 === 1) {
-                  const codeLines = part.split("\n")
-                  const code = codeLines.join("\n")
-                  return (
-                    <pre key={i} className="mt-2 p-3 rounded-lg bg-muted overflow-x-auto text-sm">
-                      <code>{code}</code>
-                    </pre>
-                  )
-                }
-                return (
-                  <p key={i} className="whitespace-pre-wrap leading-relaxed">
-                    {part}
-                  </p>
-                )
-              })}
+            <div className="whitespace-pre-wrap text-sm leading-relaxed break-words">
+              {isFileContentMessage ? message.content.split("---")[0].trim() : message.content}
             </div>
           </div>
 
-          {/* 元信息 */}
+          {/* Metadata */}
           {!isUser && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1 ml-1">
               <span>{message.tokens} tokens</span>
@@ -92,7 +92,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             </div>
           )}
 
-          {/* 操作按钮 */}
+          {/* Actions */}
           {!isUser && (
             <div className="flex items-center gap-1 mt-1 ml-1">
               <TooltipProvider>
@@ -112,7 +112,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    {copied ? "已复制" : "复制"}
+                    {copied ? "Copied" : "Copy"}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

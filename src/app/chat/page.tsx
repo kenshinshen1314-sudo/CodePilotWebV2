@@ -145,26 +145,40 @@ export default function ChatPage() {
   // Folder dialog state
   const [folderDialogOpen, setFolderDialogOpen] = useState(false)
 
+  // File dialog state (for uploading files)
+  const [fileDialogOpen, setFileDialogOpen] = useState(false)
+
+  // Uploaded files state
+  const [uploadedFiles, setUploadedFiles] = useState<Array<{ name: string; path: string; content: string }>>([])
+
   // Import session dialog state
   const [importDialogOpen, setImportDialogOpen] = useState(false)
 
   const handleSendMessage = () => {
-    if (!inputValue.trim()) return
+    if (!inputValue.trim() && uploadedFiles.length === 0) return
+
+    // Store attachments separately, only keep user message content
+    const attachments = uploadedFiles.map((file) => ({
+      name: file.name,
+      path: file.path,
+    }))
 
     const newMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: inputValue,
+      content: inputValue.trim(),
       timestamp: new Date().toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
       }),
       tokens: 0,
       cost: "",
+      attachments: attachments.length > 0 ? attachments : undefined,
     }
 
     setMessages([...messages, newMessage])
     setInputValue("")
+    setUploadedFiles([])
   }
 
   const handleNewSession = () => {
@@ -189,6 +203,29 @@ export default function ChatPage() {
 
   const handleOpenFolderDialog = () => {
     setFolderDialogOpen(true)
+  }
+
+  const handleOpenFileDialog = () => {
+    setFileDialogOpen(true)
+  }
+
+  const handleFileSelect = async (filePath: string) => {
+    // Load file content
+    try {
+      const res = await fetch(`/api/files?path=${encodeURIComponent(filePath)}`)
+      const data = await res.json()
+      if (data.content !== undefined) {
+        const fileName = filePath.split("/").pop() || "file"
+        setUploadedFiles([...uploadedFiles, { name: fileName, path: filePath, content: data.content }])
+      }
+    } catch (error) {
+      console.error("Failed to load file:", error)
+    }
+    setFileDialogOpen(false)
+  }
+
+  const handleRemoveFile = (index: number) => {
+    setUploadedFiles(uploadedFiles.filter((_, i) => i !== index))
   }
 
   const handleOpenImportDialog = () => {
@@ -248,7 +285,7 @@ export default function ChatPage() {
     loadFolderContents(folderPath)
   }
 
-  const handleFileSelect = async (file: FileNode) => {
+  const handleTreeFileSelect = async (file: FileNode) => {
     const updateSelected = (nodes: FileNode[]): FileNode[] => {
       return nodes.map((node) => {
         const newNode = { ...node, selected: node.id === file.id }
@@ -327,6 +364,9 @@ export default function ChatPage() {
             mode={chatMode}
             onModeChange={setChatMode}
             onFolderSelect={handleOpenFolderDialog}
+            onFileSelect={handleOpenFileDialog}
+            uploadedFiles={uploadedFiles}
+            onRemoveFile={handleRemoveFile}
           />
         </div>
       </div>
@@ -363,7 +403,7 @@ export default function ChatPage() {
             files={fileTree}
             selectedFile={selectedFile}
             onFilesChange={setFileTree}
-            onFileSelect={handleFileSelect}
+            onFileSelect={handleTreeFileSelect}
             onClose={handleCloseFileTree}
             onLoadChildren={handleLoadChildren}
           />
@@ -388,6 +428,13 @@ export default function ChatPage() {
         open={folderDialogOpen}
         onOpenChange={setFolderDialogOpen}
         onSelect={handleFolderSelect}
+        mode="folder"
+      />
+      <FolderDialog
+        open={fileDialogOpen}
+        onOpenChange={setFileDialogOpen}
+        onSelect={handleFileSelect}
+        mode="file"
       />
       <ImportSessionDialog
         open={importDialogOpen}
