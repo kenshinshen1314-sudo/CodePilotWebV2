@@ -1,11 +1,15 @@
 /**
- * [INPUT]: 依赖 react，依赖 lucide-react 图标，依赖 @/components/ui/card
- * [OUTPUT]: 对外提供 TopFeatures 核心功能章节组件
+ * [INPUT]: 依赖 react，依赖 framer-motion，依赖 lucide-react 图标，依赖 @/components/ui/card，依赖 @/lib/motion 的动画配置
+ * [OUTPUT]: 对外提供 TopFeatures 核心功能章节组件（含 Apple 风格动画）
  * [POS]: src/components/landing 的核心功能章节
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { History, Settings as SettingsIcon, FolderOpen, Sparkles } from "lucide-react"
+import { motion } from "framer-motion"
+import { staggerContainer, staggerItem, viewportConfig } from "@/lib/motion"
 
 interface TopFeatureItem {
   icon: React.ReactNode
@@ -41,10 +45,18 @@ const topFeatures: TopFeatureItem[] = [
 
 export function TopFeatures({ className }: TopFeaturesProps) {
   return (
-    <section className={["py-20 md:py-28 lg:py-32", className || ""].join(" ")}>
+    <motion.section
+      initial="hidden"
+      whileInView="visible"
+      viewport={viewportConfig}
+      className={["py-20 md:py-28 lg:py-32", className || ""].join(" ")}
+    >
       <div className="container">
         {/* 章节标题 */}
-        <div className="text-center mb-16">
+        <motion.div
+          variants={staggerItem}
+          className="text-center mb-16"
+        >
           <div className="inline-flex items-center gap-2 mb-4">
             <Sparkles className="h-5 w-5 text-primary" />
             <span className="text-primary font-medium">核心价值</span>
@@ -55,39 +67,43 @@ export function TopFeatures({ className }: TopFeaturesProps) {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             解决 Claude Code 命令行版最痛的痛点
           </p>
-        </div>
+        </motion.div>
 
         {/* 核心功能列表 */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <motion.div
+          variants={staggerContainer}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+        >
           {topFeatures.map((feature, index) => (
-            <Card
-              key={index}
-              variant="elevated"
-              className="relative overflow-hidden group"
-            >
-              {/* 渐变背景装饰 */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/15 transition-colors" />
+            <motion.div key={index} variants={staggerItem}>
+              <Card
+                variant="elevated"
+                className="relative overflow-hidden group h-full"
+              >
+                {/* 渐变背景装饰 */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/15 transition-colors" />
 
-              <CardHeader>
-                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-white mb-4 shadow-lg">
-                  {feature.icon}
-                </div>
-                <CardTitle className="text-2xl">{feature.title}</CardTitle>
-                <CardDescription className="text-base mt-3">
-                  {feature.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
-                  <p className="text-sm text-foreground">
-                    {feature.highlight}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                <CardHeader className="flex-none">
+                  <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-white mb-4 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                    {feature.icon}
+                  </div>
+                  <CardTitle className="text-2xl">{feature.title}</CardTitle>
+                  <CardDescription className="text-base mt-3">
+                    {feature.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 group-hover:bg-primary/10 transition-colors h-full">
+                    <p className="text-sm text-foreground">
+                      {feature.highlight}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   )
 }

@@ -1,9 +1,11 @@
 /**
- * [INPUT]: 依赖 react，依赖 lucide-react 图标，依赖 @/components/ui/card，依赖 @/components/ui/badge
- * [OUTPUT]: 对外提供 Features 功能展示章节组件
+ * [INPUT]: 依赖 react，依赖 framer-motion，依赖 lucide-react 图标，依赖 @/components/ui/card，依赖 @/components/ui/badge，依赖 @/lib/motion 的动画配置
+ * [OUTPUT]: 对外提供 Features 功能展示章节组件（含 Apple 风格动画）
  * [POS]: src/components/landing 的功能章节
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -16,6 +18,8 @@ import {
   Palette,
   TrendingUp
 } from "lucide-react"
+import { motion } from "framer-motion"
+import { staggerContainer, staggerItem, viewportConfig } from "@/lib/motion"
 
 interface FeatureItem {
   icon: React.ReactNode
@@ -73,10 +77,19 @@ const features: FeatureItem[] = [
 
 export function FeaturesSection({ className }: FeaturesSectionProps) {
   return (
-    <section id="features" className={["py-20 md:py-28 lg:py-32 bg-muted/30", className || ""].join(" ")}>
+    <motion.section
+      id="features"
+      initial="hidden"
+      whileInView="visible"
+      viewport={viewportConfig}
+      className={["py-20 md:py-28 lg:py-32 bg-muted/30", className || ""].join(" ")}
+    >
       <div className="container">
         {/* 章节标题 */}
-        <div className="text-center mb-16">
+        <motion.div
+          variants={staggerItem}
+          className="text-center mb-16"
+        >
           <Badge variant="glow" className="mb-4">功能亮点</Badge>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             强大的功能
@@ -84,31 +97,35 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             支持 Claude Code 核心功能，与命令行版能力完全一致
           </p>
-        </div>
+        </motion.div>
 
         {/* 功能网格 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div
+          variants={staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
           {features.map((feature, index) => (
-            <Card
-              key={index}
-              variant="glass"
-              className="group hover:scale-[1.02] transition-all duration-300"
-            >
-              <CardHeader>
-                <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4 group-hover:bg-primary/20 transition-colors">
-                  {feature.icon}
-                </div>
-                <CardTitle className="text-xl">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-base">
-                  {feature.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
+            <motion.div key={index} variants={staggerItem}>
+              <Card
+                variant="glass"
+                className="group h-full"
+              >
+                <CardHeader className="flex-none">
+                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4 group-hover:bg-primary/20 transition-colors">
+                    {feature.icon}
+                  </div>
+                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0 flex-1">
+                  <CardDescription className="text-base">
+                    {feature.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   )
 }

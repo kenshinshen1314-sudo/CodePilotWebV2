@@ -1,28 +1,24 @@
 /**
- * [INPUT]: 无依赖，纯配置导出
- * [OUTPUT]: 对外提供 Framer Motion 动效变体预设
- * [POS]: src/lib 的动效配置模块
+ * [INPUT]: 依赖 framer-motion
+ * [OUTPUT]: 对外提供 Apple 风格动画配置
+ * [POS]: src/lib 的动画配置模块
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
 /* ========================================
-   动效变体预设 - 用于 Landing Page
+   Apple 风格动画配置
    ======================================== */
 
+// iOS 缓动曲线
+const easeOut = [0.22, 1, 0.36, 1] as const
+
+// 滚动进入动画（带阻尼感）
 export const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
-  }
-}
-
-export const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+    transition: { duration: 0.6, ease: easeOut }
   }
 }
 
@@ -31,7 +27,7 @@ export const scaleIn = {
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+    transition: { duration: 0.5, ease: easeOut }
   }
 }
 
@@ -40,7 +36,7 @@ export const slideInLeft = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+    transition: { duration: 0.6, ease: easeOut }
   }
 }
 
@@ -49,11 +45,43 @@ export const slideInRight = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+    transition: { duration: 0.6, ease: easeOut }
   }
 }
 
-// 设计令牌
+// 序列进场容器
+export const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1
+    }
+  }
+}
+
+// 序列项动画
+export const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: easeOut }
+  }
+}
+
+// 滚动触发配置
+export const viewportConfig = {
+  once: true,
+  margin: "-50px",
+  amount: 0.3
+}
+
+/* ========================================
+   设计令牌
+   ======================================== */
+
 export const designTokens = {
   typography: {
     hero: 'text-5xl md:text-6xl lg:text-7xl',

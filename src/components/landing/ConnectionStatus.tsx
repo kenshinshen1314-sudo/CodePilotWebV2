@@ -1,12 +1,16 @@
 /**
- * [INPUT]: 依赖 react，依赖 lucide-react 图标，依赖 @/components/ui/card
- * [OUTPUT]: 对外提供 ConnectionStatus 连接状态章节组件
+ * [INPUT]: 依赖 react，依赖 framer-motion，依赖 lucide-react 图标，依赖 @/components/ui/card，依赖 @/components/ui/badge，依赖 @/lib/motion 的动画配置
+ * [OUTPUT]: 对外提供 ConnectionStatus 连接状态章节组件（含 Apple 风格动画）
  * [POS]: src/components/landing 的连接状态章节
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Wifi, WifiOff, AlertCircle, CheckCircle2 } from "lucide-react"
+import { motion } from "framer-motion"
+import { staggerContainer, staggerItem, viewportConfig } from "@/lib/motion"
 
 interface ConnectionStatusProps {
   className?: string
@@ -35,11 +39,19 @@ const connectionStates = [
 
 export function ConnectionStatus({ className }: ConnectionStatusProps) {
   return (
-    <section className={["py-20 md:py-28 lg:py-32 bg-muted/30", className || ""].join(" ")}>
+    <motion.section
+      initial="hidden"
+      whileInView="visible"
+      viewport={viewportConfig}
+      className={["py-20 md:py-28 lg:py-32 bg-muted/30", className || ""].join(" ")}
+    >
       <div className="container">
-        <div className="max-w-4xl mx-auto">
+        <motion.div
+          variants={staggerContainer}
+          className="max-w-4xl mx-auto"
+        >
           {/* 章节标题 */}
-          <div className="text-center mb-12">
+          <motion.div variants={staggerItem} className="text-center mb-12">
             <Badge variant="glass" className="mb-4 gap-2">
               <Wifi className="h-4 w-4" />
               <span>连接状态</span>
@@ -50,53 +62,59 @@ export function ConnectionStatus({ className }: ConnectionStatusProps) {
             <p className="text-xl text-muted-foreground">
               状态栏实时显示 Claude Code 连接状态
             </p>
-          </div>
+          </motion.div>
 
           {/* 状态展示 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <motion.div
+            variants={staggerContainer}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          >
             {connectionStates.map((state, index) => (
-              <Card
-                key={index}
-                variant={index === 0 ? "elevated" : "glass"}
-                className={`text-center p-6 ${index === 0 ? 'ring-2 ring-primary/20' : ''}`}
-              >
-                <CardContent className="pt-6">
-                  <div className="flex justify-center mb-4">
-                    <div className="h-16 w-16 rounded-full bg-background flex items-center justify-center shadow-sm">
-                      {state.icon}
+              <motion.div key={index} variants={staggerItem}>
+                <Card
+                  variant={index === 0 ? "elevated" : "glass"}
+                  className={`text-center p-6 h-full ${index === 0 ? 'ring-2 ring-primary/20' : ''}`}
+                >
+                  <CardContent className="pt-6 flex flex-col h-full">
+                    <div className="flex justify-center mb-4">
+                      <div className="h-16 w-16 rounded-full bg-background flex items-center justify-center shadow-sm">
+                        {state.icon}
+                      </div>
                     </div>
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{state.status}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {state.description}
-                  </p>
-                  {index === 0 && (
-                    <Badge variant="glow" className="mt-4">
-                      当前状态
-                    </Badge>
-                  )}
-                </CardContent>
-              </Card>
+                    <h3 className="text-lg font-semibold mb-2">{state.status}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {state.description}
+                    </p>
+                    {index === 0 && (
+                      <Badge variant="glow" className="mt-4 mx-auto">
+                        当前状态
+                      </Badge>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {/* 帮助提示 */}
-          <Card variant="glass" className="mt-8">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <AlertCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                <div>
-                  <h4 className="font-semibold mb-1">连接失败？</h4>
-                  <p className="text-sm text-muted-foreground">
-                    应用会提示你如何安装和启动 Claude Code。确保已安装 Node.js 和 Claude Code CLI，
-                    然后在设置中配置正确的路径。
-                  </p>
+          <motion.div variants={staggerItem} className="mt-8">
+            <Card variant="glass">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <AlertCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <h4 className="font-semibold mb-1">连接失败？</h4>
+                    <p className="text-sm text-muted-foreground">
+                      应用会提示你如何安装和启动 Claude Code。确保已安装 Node.js 和 Claude Code CLI，
+                      然后在设置中配置正确的路径。
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   )
 }
