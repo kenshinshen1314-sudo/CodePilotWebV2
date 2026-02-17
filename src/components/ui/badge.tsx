@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: 依赖 react，依赖 class-variance-authority，依赖 @/lib/utils 的 cn，依赖 radix-ui 的 Slot
+ * [OUTPUT]: 对外提供 Badge 徽章组件（shadcn/ui 基础 + glass/glow 变体）
+ * [POS]: src/components/ui 的展示标签组件
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
@@ -18,6 +24,13 @@ const badgeVariants = cva(
           "border-border text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         ghost: "[a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         link: "text-primary underline-offset-4 [a&]:hover:underline",
+        /* ========================================
+           Landing Page 专用变体：glass | glow
+           ======================================== */
+        glass:
+          "bg-background/60 backdrop-blur-md border-border/50 text-foreground shadow-sm hover:shadow-md hover:bg-background/70",
+        glow:
+          "bg-primary/10 border-primary/20 text-primary shadow-md hover:shadow-lg hover:shadow-primary/30 hover:bg-primary/15",
       },
     },
     defaultVariants: {

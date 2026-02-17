@@ -3,6 +3,7 @@
 
 成员清单
 layout/header.tsx: 头部导航组件，Logo + Design System 入口链接
+landing/ - Landing Page 章节组件目录，见 src/components/landing/CLAUDE.md
 ui/ - shadcn/ui 组件目录，见 src/components/ui/CLAUDE.md
 
 法则: 成员完整·一行一文件·父级链接·技术词前置

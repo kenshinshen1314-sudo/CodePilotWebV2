@@ -1,13 +1,13 @@
 # src/components/ui/
 > L2 | 父级: /src/components/CLAUDE.md
 
-shadcn/ui 组件库（36个）
+shadcn/ui 组件库（36个）+ Landing Page 专用变体
 
 核心交互
-button.tsx: 按钮组件，variant/default/destructive/outline/secondary/ghost/link
+button.tsx: 按钮组件，variant/default/destructive/outline/secondary/ghost/link/premium/glass
 input.tsx: 输入框组件
 label.tsx: 标签组件
-card.tsx: 卡片组件，Card/Header/Title/Description/Action/Footer
+card.tsx: 卡片组件，variant/default/glass/elevated/glow，Card/Header/Title/Description/Action/Footer
 dialog.tsx: 对话框组件，Dialog/Trigger/Content
 sheet.tsx: 侧边栏组件，Sheet/Trigger/Content
 
@@ -25,7 +25,7 @@ toggle-group.tsx: 切换组组件，ToggleGroupItem
 反馈
 alert.tsx: 警告提示组件，Alert/Title/Description
 sonner.tsx: Toast 通知组件，需 Toaster 包裹
-badge.tsx: 徽章组件
+badge.tsx: 徽章组件，variant/default/secondary/destructive/outline/ghost/link/glass/glow
 skeleton.tsx: 骨架屏组件
 progress.tsx: 进度条组件
 

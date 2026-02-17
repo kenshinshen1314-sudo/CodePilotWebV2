@@ -1,19 +1,44 @@
+/**
+ * [INPUT]: 依赖 react，依赖 @/lib/utils 的 cn
+ * [OUTPUT]: 对外提供 Card 卡片组件（shadcn/ui 基础 + glass/elevated/glow 变体）
+ * [POS]: src/components/ui 的展示容器组件
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card"
-      className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
-        className
-      )}
-      {...props}
-    />
-  )
+export interface CardProps extends React.ComponentProps<"div"> {
+  variant?: "default" | "glass" | "elevated" | "glow"
 }
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant = "default", ...props }, ref) => {
+    return (
+      <div
+        data-slot="card"
+        data-variant={variant}
+        ref={ref}
+        className={cn(
+          "flex flex-col gap-6 rounded-xl border py-6 transition-all duration-300",
+          /* ========================================
+             Landing Page 专用变体：glass | elevated | glow
+             ======================================== */
+          variant === "default" && "bg-card text-card-foreground shadow-sm",
+          variant === "glass" &&
+            "bg-background/60 backdrop-blur-md border-border/50 text-foreground shadow-lg hover:shadow-xl hover:bg-background/70",
+          variant === "elevated" &&
+            "bg-card text-card-foreground shadow-xl hover:shadow-2xl hover:-translate-y-1",
+          variant === "glow" &&
+            "bg-card text-card-foreground shadow-lg hover:shadow-2xl hover:shadow-primary/20",
+          className
+        )}
+        {...props}
+      />
+    )
+  }
+)
+Card.displayName = "Card"
 
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (

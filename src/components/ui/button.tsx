@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: 依赖 react，依赖 class-variance-authority，依赖 @/lib/utils 的 cn，依赖 radix-ui 的 Slot
+ * [OUTPUT]: 对外提供 Button 按钮组件（shadcn/ui 基础 + premium/glass 变体）
+ * [POS]: src/components/ui 的核心交互组件
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
@@ -19,6 +25,13 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        /* ========================================
+           Landing Page 专用变体：premium | glass
+           ======================================== */
+        premium:
+          "bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]",
+        glass:
+          "bg-background/80 backdrop-blur-md border border-border/50 text-foreground shadow-sm hover:shadow-md hover:bg-background/90",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

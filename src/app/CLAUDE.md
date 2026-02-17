@@ -5,7 +5,8 @@
 layout.tsx: 根布局组件，定义 metadata，包装 TooltipProvider/Toaster
 page.tsx: 首页组件，Hero 区 + Features 卡片 + Tech Stack 展示
 design-system/page.tsx: 设计系统展示页面，展示全部 30 个 shadcn/ui 组件（Colors/Typography/Buttons/Inputs/Select/Radio/Cards/Badges/Alerts/Dialog/Sheet/Popover/Dropdown/NavMenu/Accordion/Collapsible/Command/HoverCard/Tooltip/ScrollArea/Feedback/Avatar/Table）
-globals.css: 全局样式，TailwindCSS v4 + shadcn CSS 变量
+landing/page.tsx: Landing Page 落地页，Hero + Features + TopFeatures + ConnectionStatus + FinalCTA + Footer
+globals.css: 全局样式，TailwindCSS v4 + shadcn CSS 变量 + 背景网格图案
 
 法则: 成员完整·一行一文件·父级链接·技术词前置
 
