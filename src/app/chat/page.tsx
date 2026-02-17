@@ -346,7 +346,7 @@ export default function ChatPage() {
             <ChatMessage key={message.id} message={message} />
           ))}
           {messages.length === 0 && (
-            <div className="text-center py-24 text-muted-foreground">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center text-muted-foreground">
               <p className="text-lg mb-2">Start a new chat</p>
               <p className="text-sm">Select a mode below and enter your question</p>
             </div>

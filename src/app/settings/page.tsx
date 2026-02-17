@@ -7,6 +7,7 @@
 "use client"
 
 import { useState } from "react"
+import { Sidebar } from "@/components/layout/Sidebar"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
@@ -254,9 +255,11 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* 页面头部 */}
-      <div className="text-center py-12">
+    <div className="flex h-screen">
+      <Sidebar />
+      <div className="flex-1 overflow-auto">
+        {/* 页面头部 */}
+        <div className="text-center py-12">
         <h1 className="text-4xl font-bold text-foreground mb-2">Settings</h1>
         <p className="text-muted-foreground">Manage CodePilot and Claude CLI settings</p>
       </div>
@@ -492,6 +495,7 @@ export default function SettingsPage() {
         onAddProvider={handleAddProvider}
         onSaveProvider={handleSaveProvider}
       />
+      </div>
     </div>
   )
 }
