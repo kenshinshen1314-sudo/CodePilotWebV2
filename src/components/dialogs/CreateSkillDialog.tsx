@@ -4,120 +4,200 @@
  * [POS]: src/components/dialogs 的创建技能对话框组件
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
+
 import { useState } from "react"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { Globe, FolderOpen, FilePlus, GitCommit, Eye } from "lucide-react"
 
 interface CreateSkillDialogProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void
-  onCreateSkill?: (skill: {
-    name: string
-    description: string
-    prompt: string
-  }) => void
 }
 
-export function CreateSkillDialog({
-  open: controlledOpen,
-  onOpenChange,
-  onCreateSkill,
-}: CreateSkillDialogProps) {
-  const [internalOpen, setInternalOpen] = useState(false)
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [prompt, setPrompt] = useState("")
+const scopeOptions = [
+  {
+    value: "global",
+    label: "Global",
+    icon: Globe,
+    description: "Available to all projects",
+  },
+  {
+    value: "project",
+    label: "Project",
+    icon: FolderOpen,
+    description: "Only for current project",
+  },
+]
 
-  const open = controlledOpen !== undefined ? controlledOpen : internalOpen
-  const handleOpenChange = (newOpen: boolean) => {
-    if (controlledOpen === undefined) {
-      setInternalOpen(newOpen)
-    }
-    onOpenChange?.(newOpen)
-  }
+const templateOptions = [
+  {
+    value: "blank",
+    label: "Blank",
+    icon: FilePlus,
+    description: "Start from scratch",
+  },
+  {
+    value: "commit-helper",
+    label: "Commit Helper",
+    icon: GitCommit,
+    description: "Generate commit messages",
+  },
+  {
+    value: "code-reviewer",
+    label: "Code Reviewer",
+    icon: Eye,
+    description: "Review code quality",
+  },
+]
+
+export function CreateSkillDialog({ open, onOpenChange }: CreateSkillDialogProps) {
+  const [name, setName] = useState("")
+  const [scope, setScope] = useState<string>("")
+  const [template, setTemplate] = useState<string>("")
 
   const handleSubmit = () => {
-    if (!name.trim() || !prompt.trim()) return
-
-    onCreateSkill?.({
-      name: name.trim(),
-      description: description.trim(),
-      prompt: prompt.trim(),
-    })
-
-    // 重置表单
+    console.log("Creating skill:", { name, scope, template })
+    onOpenChange?.(false)
     setName("")
-    setDescription("")
-    setPrompt("")
-    handleOpenChange(false)
+    setScope("")
+    setTemplate("")
+  }
+
+  const handleCancel = () => {
+    onOpenChange?.(false)
+    setName("")
+    setScope("")
+    setTemplate("")
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>创建新 Skill</DialogTitle>
-          <DialogDescription>
-            创建一个自定义技能，让 AI 助手能够执行特定任务
-          </DialogDescription>
-        </DialogHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px] p-0">
+        <DialogTitle className="sr-only">Create new skill</DialogTitle>
 
-        <div className="space-y-4 py-4">
+        <div className="p-6 space-y-6">
+          {/* 标题 */}
+          <h2 className="text-lg font-semibold">Create new skill</h2>
+
+          {/* Skill Name */}
           <div className="space-y-2">
-            <Label htmlFor="skill-name">
-              Skill 名称 <span className="text-destructive">*</span>
-            </Label>
+            <Label htmlFor="name">Skill Name</Label>
             <Input
-              id="skill-name"
+              id="name"
+              placeholder="Enter skill name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="例如：代码审查"
             />
           </div>
 
+          {/* Scope */}
           <div className="space-y-2">
-            <Label htmlFor="skill-description">描述</Label>
-            <Input
-              id="skill-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="简要描述这个 Skill 的用途"
-            />
+            <Label>Scope</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {scopeOptions.map((option) => {
+                const Icon = option.icon
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setScope(option.value)}
+                    className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                      scope === option.value
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <div
+                      className={`w-8 h-8 rounded-md flex items-center justify-center ${
+                        scope === option.value
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-medium text-sm">{option.label}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {option.description}
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
+          {/* Template */}
           <div className="space-y-2">
-            <Label htmlFor="skill-prompt">
-              Prompt <span className="text-destructive">*</span>
-            </Label>
-            <Textarea
-              id="skill-prompt"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="输入你的提示词模板..."
-              rows={6}
-              className="resize-none"
-            />
+            <Label>Template</Label>
+            <div className="grid grid-cols-3 gap-3">
+              {templateOptions.map((option) => {
+                const Icon = option.icon
+                return (
+                  <HoverCard key={option.value} openDelay={200}>
+                    <HoverCardTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => setTemplate(option.value)}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-lg border transition-all ${
+                          template === option.value
+                            ? "border-primary bg-primary/10"
+                            : "border-border hover:border-primary/50"
+                        }`}
+                      >
+                        <div
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                            template === option.value
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted"
+                          }`}
+                        >
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <span className="text-sm font-medium">{option.label}</span>
+                      </button>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      className="w-48"
+                      side="top"
+                      align="center"
+                    >
+                      <div className="space-y-1">
+                        <div className="font-medium">{option.label}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {option.description}
+                        </div>
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* 底部按钮 */}
+          <div className="flex justify-end gap-3 pt-2">
+            <Button variant="outline" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={!name || !scope || !template}
+              className="bg-primary hover:bg-primary/90"
+            >
+              Create Skill
+            </Button>
           </div>
         </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => handleOpenChange(false)}>
-            取消
-          </Button>
-          <Button onClick={handleSubmit} disabled={!name.trim() || !prompt.trim()}>
-            创建
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

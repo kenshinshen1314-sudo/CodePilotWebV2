@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect } from "react"
-import { Code2, FolderOpen, Lightbulb, MessageCircle, Paperclip, Send, X, Bot } from "lucide-react"
+import { Code2, FolderOpen, Lightbulb, MessageCircle, Paperclip, Send, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
@@ -167,7 +167,6 @@ export function ChatInput({ value, onChange, onSend, mode = "code", onModeChange
           {availableModels.length > 0 && (
             <Select value={model} onValueChange={handleModelChange}>
               <SelectTrigger className="w-[180px] h-8">
-                <Bot className="w-3.5 h-3.5 mr-1.5" />
                 <SelectValue placeholder="Select model" />
               </SelectTrigger>
               <SelectContent>
