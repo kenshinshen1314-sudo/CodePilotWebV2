@@ -72,11 +72,12 @@ export default function ExtensionsPage() {
   const filteredSkills = mockSkills.filter((skill) => {
     if (!searchQuery) return true
     const query = searchQuery.toLowerCase()
-    return (
-      skill.name.toLowerCase().includes(query) ||
+    const matches = skill.name.toLowerCase().includes(query) ||
       skill.description.toLowerCase().includes(query)
-    )
+    console.log("Skill:", skill.name, "query:", searchQuery, "matches:", matches)
+    return matches
   })
+  console.log("filteredSkills count:", filteredSkills.length)
 
   // Filter MCP servers based on search query
   const filteredMCPServers = mockMCPServers.filter((server) => {

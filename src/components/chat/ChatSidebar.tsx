@@ -13,6 +13,7 @@ import {
   Search,
   MoreHorizontal,
   Trash2,
+  Folder,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -29,6 +30,7 @@ export interface Session {
   title: string
   updatedAt: string
   messageCount: number
+  workingDirectory?: string
 }
 
 interface ChatSidebarProps {
@@ -38,6 +40,7 @@ interface ChatSidebarProps {
   onNewSession: () => void
   onSessionDelete?: (sessionId: string) => void
   onImportSession?: () => void
+  showWorkingDirectory?: boolean
 }
 
 export function ChatSidebar({
@@ -47,6 +50,7 @@ export function ChatSidebar({
   onNewSession,
   onSessionDelete,
   onImportSession,
+  showWorkingDirectory = false,
 }: ChatSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -93,7 +97,7 @@ export function ChatSidebar({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search sessions..."
-            className="pl-9 h-9"
+            className="pl-9 h-9 w-full"
           />
         </div>
       </div>
@@ -136,6 +140,13 @@ export function ChatSidebar({
                     <span>{session.updatedAt}</span>
                     <span>·</span>
                     <span>{session.messageCount} messages</span>
+                    {showWorkingDirectory && session.workingDirectory && (
+                      <>
+                        <span>·</span>
+                        <Folder className="h-3 w-3" />
+                        <span className="truncate max-w-[100px]">{session.workingDirectory.split("/").pop()}</span>
+                      </>
+                    )}
                   </div>
                 </div>
 

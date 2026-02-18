@@ -5,8 +5,8 @@
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
-import { useState, useEffect } from "react"
-import { Code2, FolderOpen, Lightbulb, MessageCircle, Paperclip, Send, X } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Code2, FolderOpen, Lightbulb, MessageCircle, Paperclip, Send, X, FileCode } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
@@ -24,6 +24,7 @@ export type ChatMode = "code" | "plan" | "ask"
 interface UploadedFile {
   name: string
   path: string
+  content?: string
 }
 
 interface ChatInputProps {
@@ -33,7 +34,7 @@ interface ChatInputProps {
   mode?: ChatMode
   onModeChange?: (mode: ChatMode) => void
   onFolderSelect?: () => void
-  onFileSelect?: () => void
+  onFileSelect?: (filePath: string, fileContent?: string) => void
   uploadedFiles?: UploadedFile[]
   onRemoveFile?: (index: number) => void
   selectedModel?: string
@@ -50,6 +51,7 @@ export function ChatInput({ value, onChange, onSend, mode = "code", onModeChange
   const { activeProvider } = useProvider()
   const availableModels = getModelsForProvider(activeProvider)
   const [model, setModel] = useState<string>("")
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (selectedModel) {
@@ -73,10 +75,74 @@ export function ChatInput({ value, onChange, onSend, mode = "code", onModeChange
     }
   }
 
+  const handleFileButtonClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    console.log("Files selected:", files?.length)
+    if (files && files.length > 0 && onFileSelect) {
+      // Process each file
+      Array.from(files).forEach((file) => {
+        const filePath = file.webkitRelativePath || file.name
+        const fileName = file.name
+        console.log("Processing file:", fileName)
+
+        // Check if it's a text-based file that we can read
+        const isTextFile = file.type.startsWith("text/") ||
+          fileName.endsWith(".md") ||
+          fileName.endsWith(".txt") ||
+          fileName.endsWith(".json") ||
+          fileName.endsWith(".tsx") ||
+          fileName.endsWith(".ts") ||
+          fileName.endsWith(".jsx") ||
+          fileName.endsWith(".js") ||
+          fileName.endsWith(".py") ||
+          fileName.endsWith(".html") ||
+          fileName.endsWith(".css")
+
+        if (isTextFile) {
+          // Read file content
+          const reader = new FileReader()
+          reader.onload = (event) => {
+            const content = event.target?.result as string
+            console.log("File content length:", content?.length)
+            console.log("Calling onFileSelect with:", filePath)
+            if (onFileSelect) {
+              onFileSelect(filePath, content || "")
+            } else {
+              console.log("onFileSelect is not defined!")
+            }
+          }
+          reader.onerror = () => {
+            console.error("Error reading file")
+            onFileSelect(filePath, "")
+          }
+          reader.readAsText(file)
+        } else {
+          // For non-text files, just pass the path
+          console.log("Non-text file, passing path only")
+          onFileSelect(filePath, "")
+        }
+      })
+    }
+    // Reset input
+    e.target.value = ""
+  }
+
   const currentMode = MODES.find(m => m.value === mode)
 
   return (
     <Card className="p-2 w-full">
+      {/* Native file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        onChange={handleFileChange}
+        multiple
+      />
       <Textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -86,20 +152,17 @@ export function ChatInput({ value, onChange, onSend, mode = "code", onModeChange
       />
       {/* Uploaded files display */}
       {uploadedFiles.length > 0 && (
-        <div className="flex flex-wrap gap-2 px-3 pb-2">
+        <div className="space-y-2 px-3 pb-2">
           {uploadedFiles.map((file, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-1 px-2 py-1 bg-muted rounded-md text-xs"
-            >
-              <Paperclip className="h-3 w-3" />
-              <span className="max-w-[150px] truncate">{file.name}</span>
+            <div key={index} className="flex items-center gap-2">
+              <FileCode className="h-4 w-4 text-muted-foreground shrink-0" />
+              <span className="text-sm truncate">{file.name}</span>
               {onRemoveFile && (
                 <button
                   onClick={() => onRemoveFile(index)}
-                  className="ml-1 hover:text-destructive"
+                  className="ml-auto p-1 hover:text-destructive rounded shrink-0"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-4 w-4" />
                 </button>
               )}
             </div>
@@ -113,7 +176,7 @@ export function ChatInput({ value, onChange, onSend, mode = "code", onModeChange
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-muted-foreground"
-              onClick={onFileSelect}
+              onClick={handleFileButtonClick}
               title="Attach file"
             >
               <Paperclip className="h-4 w-4" />

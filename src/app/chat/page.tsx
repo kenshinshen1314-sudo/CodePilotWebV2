@@ -145,14 +145,14 @@ export default function ChatPage() {
   // Folder dialog state
   const [folderDialogOpen, setFolderDialogOpen] = useState(false)
 
-  // File dialog state (for uploading files)
-  const [fileDialogOpen, setFileDialogOpen] = useState(false)
-
   // Uploaded files state
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ name: string; path: string; content: string }>>([])
 
   // Import session dialog state
   const [importDialogOpen, setImportDialogOpen] = useState(false)
+
+  // New session folder selection state
+  const [isCreatingSession, setIsCreatingSession] = useState(false)
 
   const handleSendMessage = () => {
     if (!inputValue.trim() && uploadedFiles.length === 0) return
@@ -182,15 +182,30 @@ export default function ChatPage() {
   }
 
   const handleNewSession = () => {
+    // First, open the folder dialog to select working directory
+    setIsCreatingSession(true)
+    setFolderDialogOpen(true)
+  }
+
+  const handleNewSessionWithFolder = (folderPath: string) => {
+    // Extract folder name from path
+    const folderName = folderPath.split("/").pop() || "New Chat"
+
     const newSession: Session = {
       id: Date.now().toString(),
-      title: "New Chat",
+      title: folderName,
       updatedAt: "Just now",
       messageCount: 0,
+      workingDirectory: folderPath,
     }
+
     setSessions([newSession, ...sessions])
     setCurrentSessionId(newSession.id)
     setMessages([])
+
+    // Load folder contents for this session
+    loadFolderContents(folderPath)
+    setIsCreatingSession(false)
   }
 
   const handleSessionDelete = (sessionId: string) => {
@@ -206,22 +221,24 @@ export default function ChatPage() {
   }
 
   const handleOpenFileDialog = () => {
-    setFileDialogOpen(true)
+    // Now handled by native file picker in ChatInput
   }
 
-  const handleFileSelect = async (filePath: string) => {
-    // Load file content
-    try {
-      const res = await fetch(`/api/files?path=${encodeURIComponent(filePath)}`)
-      const data = await res.json()
-      if (data.content !== undefined) {
-        const fileName = filePath.split("/").pop() || "file"
-        setUploadedFiles([...uploadedFiles, { name: fileName, path: filePath, content: data.content }])
-      }
-    } catch (error) {
-      console.error("Failed to load file:", error)
+  const handleFileSelect = async (filePath: string, fileContent?: string) => {
+    console.log("handleFileSelect called:", filePath)
+    console.log("Current uploadedFiles:", uploadedFiles.length)
+    // Add file to uploaded files list
+    const fileName = filePath.split("/").pop() || filePath
+    // Check if file is already uploaded
+    if (!uploadedFiles.find((f) => f.path === filePath)) {
+      const newFile = { name: fileName, path: filePath, content: fileContent || "" }
+      console.log("Adding file:", newFile)
+      setUploadedFiles(prev => {
+        console.log("Previous state:", prev)
+        console.log("New state:", [...prev, newFile])
+        return [...prev, newFile]
+      })
     }
-    setFileDialogOpen(false)
   }
 
   const handleRemoveFile = (index: number) => {
@@ -282,7 +299,11 @@ export default function ChatPage() {
   }
 
   const handleFolderSelect = (folderPath: string) => {
-    loadFolderContents(folderPath)
+    if (isCreatingSession) {
+      handleNewSessionWithFolder(folderPath)
+    } else {
+      loadFolderContents(folderPath)
+    }
   }
 
   const handleTreeFileSelect = async (file: FileNode) => {
@@ -327,6 +348,7 @@ export default function ChatPage() {
       onNewSession={handleNewSession}
       onSessionDelete={handleSessionDelete}
       onImportSession={handleOpenImportDialog}
+      showWorkingDirectory
     />
   )
 
@@ -364,7 +386,7 @@ export default function ChatPage() {
             mode={chatMode}
             onModeChange={setChatMode}
             onFolderSelect={handleOpenFolderDialog}
-            onFileSelect={handleOpenFileDialog}
+            onFileSelect={handleFileSelect}
             uploadedFiles={uploadedFiles}
             onRemoveFile={handleRemoveFile}
           />
@@ -429,12 +451,6 @@ export default function ChatPage() {
         onOpenChange={setFolderDialogOpen}
         onSelect={handleFolderSelect}
         mode="folder"
-      />
-      <FolderDialog
-        open={fileDialogOpen}
-        onOpenChange={setFileDialogOpen}
-        onSelect={handleFileSelect}
-        mode="file"
       />
       <ImportSessionDialog
         open={importDialogOpen}
