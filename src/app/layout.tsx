@@ -9,6 +9,11 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { ProviderProvider } from "@/lib/provider-context";
+import { I18nProvider } from "@/components/layout/I18nProvider";
+import { PanelProvider } from "@/components/panel/PanelProvider";
+import { SplitProvider } from "@/components/split/SplitProvider";
+import { BatchImageGenProvider } from "@/components/chat/batch-image-gen";
+import { ImageGenProvider } from "@/components/ai-elements/ImageGenProvider";
 
 export const metadata: Metadata = {
   title: "CodePilot Web",
@@ -24,9 +29,19 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body>
         <TooltipProvider>
-          <ProviderProvider>
-            {children}
-          </ProviderProvider>
+          <I18nProvider>
+            <PanelProvider>
+              <SplitProvider>
+                <BatchImageGenProvider>
+                <ImageGenProvider>
+                  <ProviderProvider>
+                    {children}
+                  </ProviderProvider>
+                </ImageGenProvider>
+              </BatchImageGenProvider>
+              </SplitProvider>
+            </PanelProvider>
+          </I18nProvider>
         </TooltipProvider>
         <Toaster />
       </body>

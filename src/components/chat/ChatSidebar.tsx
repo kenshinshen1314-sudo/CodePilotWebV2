@@ -11,19 +11,13 @@ import {
   Plus,
   Clock,
   Search,
-  MoreHorizontal,
   Trash2,
   Folder,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { ConnectionStatus } from "@/components/layout/ConnectionStatus"
 
 export interface Session {
   id: string
@@ -62,21 +56,20 @@ export function ChatSidebar({
     <div className="flex flex-col h-full">
       {/* Logo and new button */}
       <div className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
-            <span className="font-semibold">CodePilot</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={onNewSession}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
+        <div className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5" />
+          <span className="font-semibold">CodePilot</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <ConnectionStatus />
+          <Button
+            variant="ghost"
+            className="flex-1 justify-start"
+            onClick={onNewSession}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            <span className="text-sm">New session</span>
+          </Button>
         </div>
 
         {/* Import CLI Session entry */}
@@ -116,8 +109,8 @@ export function ChatSidebar({
               )}
               onClick={() => onSessionSelect(session.id)}
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2 pr-8">
+                <div className="flex-1 min-w-0 overflow-hidden">
                   <h4
                     className={cn(
                       "text-sm font-medium truncate",
@@ -130,53 +123,41 @@ export function ChatSidebar({
                   </h4>
                   <div
                     className={cn(
-                      "flex items-center gap-1.5 text-xs mt-1",
+                      "flex items-center gap-1.5 text-xs mt-1 truncate",
                       currentSessionId === session.id
                         ? "text-muted-foreground"
                         : "text-muted-foreground"
                     )}
                   >
-                    <Clock className="h-3 w-3" />
-                    <span>{session.updatedAt}</span>
-                    <span>·</span>
-                    <span>{session.messageCount} messages</span>
+                    <Clock className="h-3 w-3 shrink-0" />
+                    <span className="shrink-0">{session.updatedAt}</span>
+                    <span className="shrink-0">·</span>
+                    <span className="shrink-0">{session.messageCount} messages</span>
                     {showWorkingDirectory && session.workingDirectory && (
                       <>
-                        <span>·</span>
-                        <Folder className="h-3 w-3" />
-                        <span className="truncate max-w-[100px]">{session.workingDirectory.split("/").pop()}</span>
+                        <span className="shrink-0">·</span>
+                        <Folder className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{session.workingDirectory.split("/").pop()}</span>
                       </>
                     )}
                   </div>
                 </div>
 
                 {onSessionDelete && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={cn(
-                          "h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity",
-                          currentSessionId === session.id && "opacity-100"
-                        )}
-                      >
-                        <MoreHorizontal className="h-3.5 w-3.5" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onSessionDelete(session.id)
-                        }}
-                        className="text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Session
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onSessionDelete(session.id)
+                    }}
+                    className={cn(
+                      "absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center rounded-md transition-opacity",
+                      "text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10",
+                      "opacity-0 group-hover:opacity-100",
+                      currentSessionId === session.id && "opacity-100"
+                    )}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
                 )}
               </div>
             </div>
