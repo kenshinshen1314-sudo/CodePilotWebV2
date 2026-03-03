@@ -9,11 +9,12 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { MessageSquare, Puzzle, Settings } from "lucide-react"
+import { MessageSquare, Puzzle, Settings, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
   { href: "/chat", icon: MessageSquare, label: "Chat" },
+  { href: "/skills", icon: Sparkles, label: "Skills" },
   { href: "/extensions", icon: Puzzle, label: "Extensions" },
   { href: "/settings", icon: Settings, label: "Settings" },
 ]
