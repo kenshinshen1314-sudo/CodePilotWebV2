@@ -1,43 +1,30 @@
 "use client";
 
-import type { ComponentProps } from "react";
-
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowDownIcon, DownloadIcon } from "lucide-react";
 import { useCallback } from "react";
-import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 
-export type ConversationProps = ComponentProps<typeof StickToBottom>;
+// Simple conversation components (no StickToBottom dependency)
+
+export type ConversationProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const Conversation = ({ className, ...props }: ConversationProps) => (
-    <StickToBottom
-        className={cn("relative flex-1 overflow-y-hidden", className)}
-        initial="smooth"
-        resize="instant"
-        role="log"
-        {...props}
-    />
+    <div className={cn("relative flex flex-col h-full", className)} {...props} />
 );
 
-export type ConversationContentProps = ComponentProps<
-    typeof StickToBottom.Content
->;
+export type ConversationContentProps = React.HTMLAttributes<HTMLDivElement>;
 
-export const ConversationContent = ({
-    className,
-    ...props
-}: ConversationContentProps) => (
-    <StickToBottom.Content
-        className={cn("flex flex-col gap-8 p-4", className)}
-        {...props}
-    />
+export const ConversationContent = ({ className, ...props }: ConversationContentProps) => (
+    <div className={cn("flex flex-col gap-6", className)} {...props} />
 );
 
-export type ConversationEmptyStateProps = ComponentProps<"div"> & {
+export type ConversationEmptyStateProps = {
     title?: string;
     description?: string;
     icon?: React.ReactNode;
+    className?: string;
+    children?: React.ReactNode;
 };
 
 export const ConversationEmptyState = ({
@@ -46,14 +33,12 @@ export const ConversationEmptyState = ({
     description = "Start a conversation to see messages here",
     icon,
     children,
-    ...props
 }: ConversationEmptyStateProps) => (
     <div
         className={cn(
             "flex size-full flex-col items-center justify-center gap-3 p-8 text-center",
             className
         )}
-        {...props}
     >
         {children ?? (
             <>
@@ -69,34 +54,27 @@ export const ConversationEmptyState = ({
     </div>
 );
 
-export type ConversationScrollButtonProps = ComponentProps<typeof Button>;
+export type ConversationScrollButtonProps = React.ComponentProps<typeof Button>;
 
 export const ConversationScrollButton = ({
     className,
+    onClick,
     ...props
 }: ConversationScrollButtonProps) => {
-    const { isAtBottom, scrollToBottom } = useStickToBottomContext();
-
-    const handleScrollToBottom = useCallback(() => {
-        scrollToBottom();
-    }, [scrollToBottom]);
-
     return (
-        !isAtBottom && (
-            <Button
-                className={cn(
-                    "absolute bottom-4 left-[50%] translate-x-[-50%] rounded-full dark:bg-background dark:hover:bg-muted",
-                    className
-                )}
-                onClick={handleScrollToBottom}
-                size="icon"
-                type="button"
-                variant="outline"
-                {...props}
-            >
-                <ArrowDownIcon className="size-4" />
-            </Button>
-        )
+        <Button
+            className={cn(
+                "absolute bottom-4 left-[50%] translate-x-[-50%] rounded-full shadow-sm",
+                className
+            )}
+            onClick={onClick}
+            size="icon"
+            type="button"
+            variant="outline"
+            {...props}
+        >
+            <ArrowDownIcon className="size-4" />
+        </Button>
     );
 };
 
@@ -106,7 +84,7 @@ export interface ConversationMessage {
 }
 
 export type ConversationDownloadProps = Omit<
-    ComponentProps<typeof Button>,
+    React.ComponentProps<typeof Button>,
     "onClick"
 > & {
     messages: ConversationMessage[];
@@ -143,16 +121,14 @@ export const ConversationDownload = ({
         const link = document.createElement("a");
         link.href = url;
         link.download = filename;
-        document.body.append(link);
         link.click();
-        link.remove();
         URL.revokeObjectURL(url);
     }, [messages, filename, formatMessage]);
 
     return (
         <Button
             className={cn(
-                "absolute top-4 right-4 rounded-full dark:bg-background dark:hover:bg-muted",
+                "absolute top-4 right-4 rounded-full shadow-sm",
                 className
             )}
             onClick={handleDownload}

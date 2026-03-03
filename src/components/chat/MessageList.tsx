@@ -1,45 +1,14 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useStickToBottomContext } from 'use-stick-to-bottom';
+import { ArrowDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import type { Message, PermissionRequestEvent } from '@/types';
-import {
-    Conversation,
-    ConversationContent,
-    ConversationScrollButton,
-    ConversationEmptyState,
-} from '@/components/ai-elements/conversation';
 import { MessageItem } from './MessageItem';
 import { StreamingMessage } from './StreamingMessage';
 import { CodePilotLogo } from './CodePilotLogo';
-
-/**
- * Scrolls to bottom when streaming starts or new messages are appended.
- * Must be rendered inside <Conversation> (StickToBottom provider).
- */
-function ScrollOnStream({ isStreaming, messageCount }: { isStreaming: boolean; messageCount: number }) {
-    const { scrollToBottom } = useStickToBottomContext();
-    const wasStreaming = useRef(false);
-    const prevCount = useRef(messageCount);
-
-    // Scroll when new messages are appended (covers optimistic user message + assistant completion)
-    useEffect(() => {
-        if (messageCount > prevCount.current) {
-            scrollToBottom();
-        }
-        prevCount.current = messageCount;
-    }, [messageCount, scrollToBottom]);
-
-    useEffect(() => {
-        if (isStreaming && !wasStreaming.current) {
-            scrollToBottom();
-        }
-        wasStreaming.current = isStreaming;
-    }, [isStreaming, scrollToBottom]);
-
-    return null;
-}
 
 interface ToolUseInfo {
     id: string;
@@ -87,9 +56,10 @@ export function MessageList({
     onLoadMore,
 }: MessageListProps) {
     const { t } = useTranslation();
-    // Scroll anchor: preserve position when older messages are prepended
+    const scrollRef = useRef<HTMLDivElement>(null);
     const anchorIdRef = useRef<string | null>(null);
     const prevMessageCountRef = useRef(messages.length);
+    const [showScrollButton, setShowScrollButton] = useState(false);
 
     // Before loading more, record the first visible message ID
     const handleLoadMore = () => {
@@ -103,61 +73,114 @@ export function MessageList({
     useEffect(() => {
         if (anchorIdRef.current && messages.length > prevMessageCountRef.current) {
             const el = document.getElementById(`msg-${anchorIdRef.current}`);
-            if (el) {
-                el.scrollIntoView({ block: 'start' });
+            if (el && scrollRef.current) {
+                const scrollTop = el.offsetTop - scrollRef.current.offsetTop;
+                scrollRef.current.scrollTop = scrollTop;
             }
             anchorIdRef.current = null;
         }
         prevMessageCountRef.current = messages.length;
     }, [messages]);
 
+    // Scroll to bottom when new messages are added or streaming starts
+    useEffect(() => {
+        const messageCount = messages.length;
+        if (messageCount > prevMessageCountRef.current) {
+            scrollToBottom();
+            prevMessageCountRef.current = messageCount;
+        }
+    }, [messages.length]);
+
+    // Auto-scroll during streaming
+    useEffect(() => {
+        if (isStreaming) {
+            scrollToBottom();
+        }
+    }, [streamingContent, isStreaming]);
+
+    const scrollToBottom = () => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+    };
+
+    // Check scroll position to show/hide scroll button
+    const handleScroll = () => {
+        if (scrollRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+            const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
+            setShowScrollButton(!isAtBottom);
+        }
+    };
+
     if (messages.length === 0 && !isStreaming) {
         return (
-            <ConversationEmptyState
-                title="Claude Chat"
-                description={t('messageList.emptyDescription')}
-                icon={<CodePilotLogo className="h-16 w-16" />}
-            />
+            <div className="flex size-full flex-col items-center justify-center gap-3 p-8 text-center">
+                <CodePilotLogo className="h-16 w-16 text-muted-foreground" />
+                <div className="space-y-1">
+                    <h3 className="font-medium text-sm">{t('chat.newConversation')}</h3>
+                    <p className="text-muted-foreground text-sm">{t('messageList.emptyDescription')}</p>
+                </div>
+            </div>
         );
     }
 
     return (
-        <Conversation>
-            <ScrollOnStream isStreaming={isStreaming} messageCount={messages.length} />
-            <ConversationContent className="mx-auto max-w-3xl px-4 py-6 gap-6">
-                {hasMore && (
-                    <div className="flex justify-center">
-                        <button
-                            onClick={handleLoadMore}
-                            disabled={loadingMore}
-                            className="text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-                        >
-                            {loadingMore ? t('messageList.loading') : t('messageList.loadEarlier')}
-                        </button>
-                    </div>
-                )}
-                {messages.map((message) => (
-                    <div key={message.id} id={`msg-${message.id}`}>
-                        <MessageItem message={message} />
-                    </div>
-                ))}
+        <div className="relative flex h-full flex-col">
+            {/* Scrollable message area */}
+            <div
+                ref={scrollRef}
+                onScroll={handleScroll}
+                className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-6"
+            >
+                <div className="mx-auto max-w-3xl space-y-6">
+                    {hasMore && (
+                        <div className="flex justify-center">
+                            <button
+                                onClick={handleLoadMore}
+                                disabled={loadingMore}
+                                className="text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                            >
+                                {loadingMore ? t('messageList.loading') : t('messageList.loadEarlier')}
+                            </button>
+                        </div>
+                    )}
+                    {messages.map((message) => (
+                        <div key={message.id} id={`msg-${message.id}`}>
+                            <MessageItem message={message} />
+                        </div>
+                    ))}
 
-                {isStreaming && (
-                    <StreamingMessage
-                        content={streamingContent}
-                        isStreaming={isStreaming}
-                        toolUses={toolUses}
-                        toolResults={toolResults}
-                        streamingToolOutput={streamingToolOutput}
-                        statusText={statusText}
-                        pendingPermission={pendingPermission}
-                        onPermissionResponse={onPermissionResponse}
-                        permissionResolved={permissionResolved}
-                        onForceStop={onForceStop}
-                    />
-                )}
-            </ConversationContent>
-            <ConversationScrollButton />
-        </Conversation>
+                    {isStreaming && (
+                        <StreamingMessage
+                            content={streamingContent}
+                            isStreaming={isStreaming}
+                            toolUses={toolUses}
+                            toolResults={toolResults}
+                            streamingToolOutput={streamingToolOutput}
+                            statusText={statusText}
+                            pendingPermission={pendingPermission}
+                            onPermissionResponse={onPermissionResponse}
+                            permissionResolved={permissionResolved}
+                            onForceStop={onForceStop}
+                        />
+                    )}
+                </div>
+            </div>
+
+            {/* Scroll to bottom button */}
+            {showScrollButton && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
+                    <Button
+                        size="icon"
+                        variant="outline"
+                        className="rounded-full h-8 w-8 shadow-md"
+                        onClick={scrollToBottom}
+                    >
+                        <ArrowDown className="h-4 w-4" />
+                    </Button>
+                </div>
+            )}
+        </div>
     );
 }
