@@ -136,17 +136,52 @@ export function ChatView({ sessionId, initialMessages = [], initialHasMore = fal
                 // Append the final assistant message to the messages list
                 const finalContent = event.snapshot.finalMessageContent;
                 if (finalContent) {
-                    const assistantMessage: Message = {
-                        id: 'temp-assistant-' + Date.now(),
-                        session_id: sessionId,
-                        role: 'assistant',
-                        content: finalContent,
-                        created_at: new Date().toISOString(),
-                        token_usage: event.snapshot.tokenUsage ? JSON.stringify(event.snapshot.tokenUsage) : null,
-                    };
-                    // Transfer pending reference images to this message ID
-                    transferPendingToMessage(assistantMessage.id);
-                    setMessages((prev) => [...prev, assistantMessage]);
+                    // Save to database first
+                    fetch('/api/chat/messages', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            session_id: sessionId,
+                            role: 'assistant',
+                            content: finalContent,
+                            token_usage: event.snapshot.tokenUsage ? JSON.stringify(event.snapshot.tokenUsage) : null,
+                        }),
+                    })
+                    .then(async (res) => {
+                        if (res.ok) {
+                            const data = await res.json();
+                            const savedMessage = data.message;
+                            // Transfer pending reference images to the saved message ID
+                            transferPendingToMessage(savedMessage.id);
+                            // Add the saved message (with proper ID) to the list
+                            setMessages((prev) => [...prev, savedMessage]);
+                        } else {
+                            // Fallback: add temporary message if save fails
+                            const assistantMessage: Message = {
+                                id: 'temp-assistant-' + Date.now(),
+                                session_id: sessionId,
+                                role: 'assistant',
+                                content: finalContent,
+                                created_at: new Date().toISOString(),
+                                token_usage: event.snapshot.tokenUsage ? JSON.stringify(event.snapshot.tokenUsage) : null,
+                            };
+                            transferPendingToMessage(assistantMessage.id);
+                            setMessages((prev) => [...prev, assistantMessage]);
+                        }
+                    })
+                    .catch(() => {
+                        // Fallback: add temporary message if request fails
+                        const assistantMessage: Message = {
+                            id: 'temp-assistant-' + Date.now(),
+                            session_id: sessionId,
+                            role: 'assistant',
+                            content: finalContent,
+                            created_at: new Date().toISOString(),
+                            token_usage: event.snapshot.tokenUsage ? JSON.stringify(event.snapshot.tokenUsage) : null,
+                        };
+                        transferPendingToMessage(assistantMessage.id);
+                        setMessages((prev) => [...prev, assistantMessage]);
+                    });
                 }
 
                 // Clear the snapshot from the manager since we've consumed it

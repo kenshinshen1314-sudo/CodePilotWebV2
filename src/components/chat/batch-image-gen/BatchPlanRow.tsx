@@ -29,7 +29,7 @@ export function BatchPlanRow({ item, index, onUpdate, onRemove, disabled }: Batc
                     <textarea
                         value={item.prompt}
                         onChange={e => onUpdate(index, { prompt: e.target.value })}
-                        className="w-full rounded-md border border-border/40 bg-transparent px-2 py-1.5 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                        className="w-full rounded-md border border-border/40 bg-transparent px-2 py-1.5 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-ring"
                         rows={2}
                         disabled={disabled}
                         placeholder={t('batchImageGen.prompt' as TranslationKey)}
@@ -41,7 +41,7 @@ export function BatchPlanRow({ item, index, onUpdate, onRemove, disabled }: Batc
                         <select
                             value={item.aspectRatio}
                             onChange={e => onUpdate(index, { aspectRatio: e.target.value })}
-                            className="rounded-md border border-border/40 bg-transparent px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                            className="rounded-md border border-border/40 bg-transparent px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
                             disabled={disabled}
                         >
                             {ASPECT_RATIOS.map(r => (
@@ -53,7 +53,7 @@ export function BatchPlanRow({ item, index, onUpdate, onRemove, disabled }: Batc
                         <select
                             value={item.resolution}
                             onChange={e => onUpdate(index, { resolution: e.target.value })}
-                            className="rounded-md border border-border/40 bg-transparent px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                            className="rounded-md border border-border/40 bg-transparent px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
                             disabled={disabled}
                         >
                             {RESOLUTIONS.map(r => (
@@ -65,7 +65,7 @@ export function BatchPlanRow({ item, index, onUpdate, onRemove, disabled }: Batc
                         {item.tags.length > 0 && (
                             <div className="flex items-center gap-1 overflow-hidden">
                                 {item.tags.map((tag, i) => (
-                                    <span key={i} className="inline-block rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 px-1.5 py-0 text-[10px]">
+                                    <span key={i} className="inline-block rounded-full bg-primary/10 text-primary px-1.5 py-0 text-[10px]">
                                         {tag}
                                     </span>
                                 ))}

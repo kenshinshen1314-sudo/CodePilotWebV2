@@ -9,10 +9,12 @@
 import { usePathname } from "next/navigation"
 import { ChatLayout } from "@/components/chat"
 import { ChatListPanel } from "@/components/layout/ChatListPanel"
-import { MessageSquare } from "lucide-react"
+import { CodePilotLogo } from "@/components/chat/CodePilotLogo"
+import { useTranslation } from "@/hooks/useTranslation"
 
 export default function ChatPage() {
   const pathname = usePathname()
+  const { t } = useTranslation()
 
   // 判断是否在会话详情页
   const isInSession = /^\/chat\/[^/]+$/.test(pathname)
@@ -23,11 +25,11 @@ export default function ChatPage() {
       mainContent={
         isInSession ? null : (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">
-            <div className="text-center space-y-4">
-              <MessageSquare className="h-16 w-16 mx-auto text-muted-foreground/40" />
-              <div>
-                <p className="text-lg font-medium">Welcome to CodePilot</p>
-                <p className="text-sm mt-2">Select a conversation from the sidebar or create a new one</p>
+            <div className="flex size-full flex-col items-center justify-center gap-3 p-8 text-center">
+              <CodePilotLogo className="h-16 w-16 text-muted-foreground" />
+              <div className="space-y-1">
+                <h3 className="font-medium text-sm">{t('chat.newConversation')}</h3>
+                <p className="text-muted-foreground text-sm">{t('messageList.emptyDescription')}</p>
               </div>
             </div>
           </div>

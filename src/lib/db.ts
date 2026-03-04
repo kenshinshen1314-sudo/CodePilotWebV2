@@ -695,7 +695,7 @@ export function createSession(
 ): ChatSession {
     const db = getDb();
     const id = crypto.randomBytes(16).toString('hex');
-    const now = new Date().toISOString().replace('T', ' ').split('.')[0];
+    const now = new Date().toISOString().replace('T', ' ').split('.')[0] + 'Z';
     const wd = workingDirectory || '';
     const projectName = path.basename(wd);
 
@@ -714,7 +714,7 @@ export function deleteSession(id: string): boolean {
 
 export function updateSessionTimestamp(id: string): void {
     const db = getDb();
-    const now = new Date().toISOString().replace('T', ' ').split('.')[0];
+    const now = new Date().toISOString().replace('T', ' ').split('.')[0] + 'Z';
     db.prepare('UPDATE chat_sessions SET updated_at = ? WHERE id = ?').run(now, id);
 }
 
@@ -805,7 +805,7 @@ export function addMessage(
 ): Message {
     const db = getDb();
     const id = crypto.randomBytes(16).toString('hex');
-    const now = new Date().toISOString().replace('T', ' ').split('.')[0];
+    const now = new Date().toISOString().replace('T', ' ').split('.')[0] + 'Z';
 
     db.prepare(
         'INSERT INTO messages (id, session_id, role, content, created_at, token_usage) VALUES (?, ?, ?, ?, ?, ?)'
@@ -1445,7 +1445,7 @@ export function setSessionRuntimeStatus(
     error?: string,
 ): void {
     const db = getDb();
-    const now = new Date().toISOString().replace('T', ' ').split('.')[0];
+    const now = new Date().toISOString().replace('T', ' ').split('.')[0] + 'Z';
     db.prepare(
         'UPDATE chat_sessions SET runtime_status = ?, runtime_updated_at = ?, runtime_error = ? WHERE id = ?'
     ).run(status, now, error || '', sessionId);

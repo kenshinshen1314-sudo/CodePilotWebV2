@@ -22,9 +22,9 @@ export function BatchExecutionDashboard() {
     const hasFailedItems = items.some(i => i.status === 'failed');
 
     return (
-        <div className="rounded-xl border border-purple-500/20 bg-card overflow-hidden">
+        <div className="rounded-xl bg-muted/30 overflow-hidden max-w-2xl">
             {/* Header with progress */}
-            <div className="px-4 py-3 border-b border-border/40 bg-purple-500/5">
+            <div className="px-4 py-3 border-b border-border/10 bg-background/50">
                 <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-medium text-foreground">
                         {t('batchImageGen.totalProgress' as TranslationKey)}
@@ -40,12 +40,9 @@ export function BatchExecutionDashboard() {
                 {/* Progress bar */}
                 <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                     <div
-                        className="h-full rounded-full transition-all duration-300"
+                        className="h-full rounded-full bg-primary transition-all duration-300"
                         style={{
                             width: `${progressPercent}%`,
-                            background: progress.failed > 0
-                                ? 'linear-gradient(90deg, rgb(168, 85, 247) 0%, rgb(239, 68, 68) 100%)'
-                                : 'rgb(168, 85, 247)',
                         }}
                     />
                 </div>
@@ -84,7 +81,7 @@ export function BatchExecutionDashboard() {
                         <button
                             type="button"
                             onClick={resumeJob}
-                            className="text-xs px-3 py-1.5 rounded-md bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+                            className="text-xs px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                         >
                             {t('batchImageGen.resume' as TranslationKey)}
                         </button>

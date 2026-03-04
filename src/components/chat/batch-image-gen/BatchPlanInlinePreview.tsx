@@ -73,9 +73,9 @@ export function BatchPlanInlinePreview({ plan: initialPlan, messageId }: BatchPl
     }
 
     return (
-        <div className="rounded-xl border border-purple-500/20 bg-card overflow-hidden">
+        <div className="rounded-xl bg-muted/30 overflow-hidden max-w-2xl">
             {/* Header */}
-            <div className="px-4 py-3 border-b border-border/40 bg-purple-500/5">
+            <div className="px-4 py-3 border-b border-border/10 bg-background/50">
                 <div className="flex items-center justify-between">
                     <h3 className="text-sm font-medium text-foreground">
                         {t('batchImageGen.planPreviewTitle' as TranslationKey)}
@@ -104,11 +104,11 @@ export function BatchPlanInlinePreview({ plan: initialPlan, messageId }: BatchPl
             </div>
 
             {/* Footer Actions */}
-            <div className="px-4 py-3 border-t border-border/40 flex items-center gap-2">
+            <div className="px-4 py-3 border-t border-border/10 flex items-center gap-2">
                 <button
                     type="button"
                     onClick={handleAddItem}
-                    className="text-xs text-purple-600 dark:text-purple-400 hover:underline"
+                    className="text-xs text-primary hover:underline"
                 >
                     + {t('batchImageGen.addItem' as TranslationKey)}
                 </button>
@@ -117,7 +117,7 @@ export function BatchPlanInlinePreview({ plan: initialPlan, messageId }: BatchPl
                     type="button"
                     onClick={handleExecute}
                     disabled={localPlan.items.length === 0}
-                    className="inline-flex items-center justify-center rounded-lg px-4 py-1.5 text-xs font-medium bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="inline-flex items-center justify-center rounded-lg px-4 py-1.5 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                     {t('batchImageGen.confirmAndExecute' as TranslationKey)}
                 </button>

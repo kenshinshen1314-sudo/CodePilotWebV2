@@ -13,8 +13,15 @@ export function cn(...inputs: ClassValue[]) {
 
 /**
  * Parse database date string to Date object.
- * Handles ISO 8601 format and other common date formats.
+ * Handles ISO 8601 format and SQLite datetime format.
+ *
+ * SQLite stores datetime('now') as UTC time in format: "YYYY-MM-DD HH:MM:SS"
+ * We append 'Z' to tell JavaScript this is UTC time, not local time.
  */
 export function parseDBDate(dateStr: string): Date {
-  return new Date(dateStr)
+  // If the string doesn't contain timezone info (Z or ±HH:MM), it's UTC from SQLite
+  if (!dateStr.includes('Z') && !dateStr.includes('+') && dateStr.includes(' ')) {
+    return new Date(dateStr + 'Z');
+  }
+  return new Date(dateStr);
 }

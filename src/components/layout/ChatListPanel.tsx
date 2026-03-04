@@ -175,19 +175,9 @@ export function ChatListPanel({ open, width }: ChatListPanelProps) {
             return;
         }
 
-        // Validate the saved directory still exists
+        // Create session directly (backend will validate directory)
         setCreatingChat(true);
         try {
-            const checkRes = await fetch(
-                `/api/files/browse?dir=${encodeURIComponent(lastDir)}`
-            );
-            if (!checkRes.ok) {
-                // Directory is gone — clear stale value and prompt user
-                localStorage.removeItem("codepilot:last-working-directory");
-                openFolderPicker();
-                return;
-            }
-
             const { model, provider_id } = getCurrentModelAndProvider();
             const res = await fetch("/api/chat/sessions", {
                 method: "POST",
@@ -195,20 +185,25 @@ export function ChatListPanel({ open, width }: ChatListPanelProps) {
                 body: JSON.stringify({ working_directory: lastDir, model, provider_id }),
             });
             if (!res.ok) {
-                // Backend rejected it (e.g. INVALID_DIRECTORY) — prompt user
-                localStorage.removeItem("codepilot:last-working-directory");
-                openFolderPicker();
-                return;
+                const data = await res.json().catch(() => ({ error: 'Failed to create session' }));
+                // If directory is invalid, clear stale value and prompt user
+                if (data.error?.code === 'INVALID_DIRECTORY' || data.error?.includes('does not exist')) {
+                    localStorage.removeItem("codepilot:last-working-directory");
+                    openFolderPicker();
+                    return;
+                }
+                throw new Error(data.error || 'Failed to create session');
             }
             const data = await res.json();
             router.push(`/chat/${data.session.id}`);
             window.dispatchEvent(new CustomEvent("session-created"));
         } catch {
+            // On any error, prompt user to pick directory
             openFolderPicker();
         } finally {
             setCreatingChat(false);
         }
-    }, [router, workingDirectory, openFolderPicker]);
+    }, [router, workingDirectory, openFolderPicker, getCurrentModelAndProvider]);
 
     const toggleProject = useCallback((wd: string) => {
         setCollapsedProjects((prev) => {

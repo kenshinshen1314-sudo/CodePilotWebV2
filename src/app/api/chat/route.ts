@@ -25,22 +25,30 @@ export async function POST(request: Request) {
       })
     }
 
+    // Detect image agent mode from system prompt content
+    const isImageAgentMode = systemPromptAppend?.includes('图像生成助手') || false;
+
+    // Map mode to SDK permissionMode
+    // - plan: requires user approval for edits
+    // - code/ask: auto-approve edits
+    const permissionMode = mode === 'plan' ? 'plan' : 'acceptEdits';
+
     // Create a TransformStream to convert the stream to SSE format
     const stream = streamClaude({
       prompt: content,
       sessionId: session_id,
       sdkSessionId: undefined,
       model: model || 'claude-sonnet-4-20250514',
-      systemPrompt: undefined,
+      systemPrompt: systemPromptAppend,
       workingDirectory: undefined,
       mcpServers: undefined,
       abortController,
-      permissionMode: undefined,
+      permissionMode,
       files,
       toolTimeoutSeconds: 0,
       conversationHistory: undefined,
       onRuntimeStatusChange: undefined,
-      imageAgentMode: undefined,
+      imageAgentMode: isImageAgentMode,
       provider: provider_id ? { id: provider_id } : undefined,
     })
 
