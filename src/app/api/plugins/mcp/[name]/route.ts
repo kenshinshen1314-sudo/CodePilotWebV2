@@ -4,27 +4,27 @@ import path from 'path';
 import os from 'os';
 import type { MCPServerConfig, ErrorResponse, SuccessResponse } from '@/types';
 
-function getSettingsPath(): string {
-  return path.join(os.homedir(), '.claude', 'settings.json');
+function getConfigPath(): string {
+  return path.join(os.homedir(), '.claude', 'config.json');
 }
 
-function readSettings(): Record<string, unknown> {
-  const settingsPath = getSettingsPath();
-  if (!fs.existsSync(settingsPath)) return {};
+function readConfig(): Record<string, unknown> {
+  const configPath = getConfigPath();
+  if (!fs.existsSync(configPath)) return {};
   try {
-    return JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+    return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
   } catch {
     return {};
   }
 }
 
-function writeSettings(settings: Record<string, unknown>): void {
-  const settingsPath = getSettingsPath();
-  const dir = path.dirname(settingsPath);
+function writeConfig(config: Record<string, unknown>): void {
+  const configPath = getConfigPath();
+  const dir = path.dirname(configPath);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf-8');
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
 }
 
 export async function DELETE(
@@ -35,8 +35,8 @@ export async function DELETE(
     const { name } = await params;
     const serverName = decodeURIComponent(name);
 
-    const settings = readSettings();
-    const mcpServers = (settings.mcpServers || {}) as Record<string, MCPServerConfig>;
+    const config = readConfig();
+    const mcpServers = (config.mcpServers || {}) as Record<string, MCPServerConfig>;
 
     if (!mcpServers[serverName]) {
       return NextResponse.json(
@@ -46,8 +46,8 @@ export async function DELETE(
     }
 
     delete mcpServers[serverName];
-    settings.mcpServers = mcpServers;
-    writeSettings(settings);
+    config.mcpServers = mcpServers;
+    writeConfig(config);
 
     return NextResponse.json({ success: true });
   } catch (error) {
